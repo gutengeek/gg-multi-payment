@@ -1,4 +1,7 @@
 <?php
+
+use GGMP\Common\Query\Model\Paypal_Query;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -41,4 +44,17 @@ function ggmp_get_option( $key, $default = '' ) {
  */
 function ggmp_paypal( $id ) {
 	return new \GGMP\Common\Model\Entity\Paypal_Entity( $id );
+}
+
+/**
+ * Get valid paypal account.
+ */
+function ggmp_get_valid_paypal_account() {
+	$accounts = Paypal_Query::get_paypal_accounts();
+
+	foreach ( $accounts as $account ) {
+		$paypal_account = ggmp_paypal( $account->ID );
+	}
+
+	return null;
 }

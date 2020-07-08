@@ -2,6 +2,8 @@
 namespace GGMP\Core;
 
 // Exit if accessed directly.
+use GGMP\Common\Query\Model\Paypal_Query;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -28,6 +30,7 @@ class Hook {
 	 * @return array
 	 */
 	public function woocommerce_ppec_paypal_settings( $value ) {
+
 		$value['api_username']    = '';
 		$value['api_password']    = '';
 		$value['api_signature']   = '';
