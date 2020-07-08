@@ -1,6 +1,6 @@
-=== GG Bought Together for WooCommerce ===
+=== GG Multiple Payment Routing ===
 Contributors: gutengeek, ndoublehwp
-Tags: frequently bought together, frequently bought, related, upsells, woocommerce
+Tags: woocommerce
 Requires at least: 5.2
 Tested up to: 5.4.1
 Requires PHP: 7.0

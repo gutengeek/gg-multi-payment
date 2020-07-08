@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       GG Multi Paypal
+ * Plugin Name:       GG Multiple Payment Routing
  * Plugin URI:        https://gutengeek.com
- * Description:       GG Multi Paypal
+ * Description:       GG Multiple Payment Routing
  * Version:           1.0.0
  * Author:            GutenGeek
  * Author URI:        https://gutengeek.com/contact
