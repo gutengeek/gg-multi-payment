@@ -147,19 +147,6 @@ class Paypal_Entity {
 	}
 
 	/**
-	 * Edit Link
-	 *
-	 *    Return link to edit the post related with user dashboard
-	 *
-	 * @return string
-	 * @since 1.0
-	 *
-	 */
-	public function is_featured() {
-		return $this->get_meta( 'featured' );
-	}
-
-	/**
 	 * Posted Date
 	 *
 	 * Return create post with format by args,it support type: ago, date
@@ -218,6 +205,10 @@ class Paypal_Entity {
 		return $this->post_status;
 	}
 
+	public function get_limit_per_day() {
+		return $this->get_meta( 'limit_money_per_day' );
+	}
+
 	/**
 	 *    Display Sidebar on left side and next is main content
 	 *
@@ -227,5 +218,17 @@ class Paypal_Entity {
 	 */
 	public function get_posted_ago() {
 		return human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) . " " . esc_html__( 'ago', 'ggmp' );
+	}
+
+	public function get_sandbox_api_username() {
+		return $this->get_meta( 'sandbox_api_username' );
+	}
+
+	public function get_sandbox_api_password() {
+		return $this->get_meta( 'sandbox_api_password' );
+	}
+
+	public function get_sandbox_api_signature() {
+		return $this->get_meta( 'sandbox_api_signature' );
 	}
 }

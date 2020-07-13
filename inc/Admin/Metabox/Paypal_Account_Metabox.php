@@ -129,7 +129,7 @@ class Paypal_Account_Metabox extends Metabox {
 			],
 			[
 				'name'        => esc_html__( 'Limit money per day', 'ggmp' ),
-				'id'          => $prefix . 'limit_money',
+				'id'          => $prefix . 'limit_money_per_day',
 				'type'        => 'text_number',
 				'description' => esc_html__( 'Limit money per day. The default limit money is used if empty.', 'ggmp' ),
 			],

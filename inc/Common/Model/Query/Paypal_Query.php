@@ -1,5 +1,5 @@
 <?php
-namespace GGMP\Common\Query\Model;
+namespace GGMP\Common\Model\Query;
 
 class Paypal_Query {
 	/**

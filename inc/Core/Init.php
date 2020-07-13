@@ -10,6 +10,7 @@ use GGMP\Admin\Admin;
 use GGMP\Admin\Metabox as Metabox;
 use GGMP\Common\Interfaces\Intergration;
 use GGMP\Common\Posttypes;
+use GGMP\Common\Query\Model\Paypal_Query;
 use GGMP\Frontend\Enqueue;
 use GGMP\Libraries\Form\Form;
 
@@ -77,6 +78,8 @@ class Init {
 		}
 
 		$this->define_core_hook();
+
+		// add_action( 'wp_loaded', [$this, 'define_core_hook'] );
 
 		$this->define_frontend_hooks();
 
