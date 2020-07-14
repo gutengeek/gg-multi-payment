@@ -28,9 +28,10 @@ class Paypal_Query {
 	public static function get_paypal_accounts( $args = [] ) {
 		$args = wp_parse_args( $args, [
 			'numberposts' => -1,
-			'order_by'    => 'title',
-			'order'       => 'DESC',
 			'post_status' => 'publish',
+			'order'       => 'DESC',
+			'orderby'     => 'meta_value_num',
+			'meta_key'    => GGMP_METABOX_PREFIX . 'priority',
 		] );
 
 		$query_args = array_merge( [ 'post_type' => 'ggmp_paypal' ], $args );

@@ -40,7 +40,6 @@ class Paypal_Entity {
 	public $filter;
 
 	public function __construct( $_id ) {
-
 		$paypal    = WP_Post::get_instance( $_id );
 		$this->ID  = $_id;
 		$this->map = $this->get_meta( 'map' );
@@ -50,8 +49,6 @@ class Paypal_Entity {
 
 	/**
 	 * Magic __get function to dispatch a call to retrieve a private paypal
-	 *
-	 * @since 1.0
 	 */
 	public function __get( $key ) {
 		if ( method_exists( $this, 'get_' . $key ) ) {
@@ -69,7 +66,6 @@ class Paypal_Entity {
 	 * @since 1.0
 	 */
 	public function create( $data = [] ) {
-
 		if ( $this->id != 0 ) {
 			return false;
 		}
@@ -110,10 +106,8 @@ class Paypal_Entity {
 	 *
 	 * @param WP_Post $paypal The WP_Post object for paypal.
 	 * @return bool         If the setup was successful or not
-	 * @since  1.0
 	 */
 	private function setup( $paypal ) {
-
 		if ( ! is_object( $paypal ) ) {
 			return false;
 		}
@@ -133,14 +127,14 @@ class Paypal_Entity {
 		return true;
 	}
 
+	public function get_id() {
+		return $this->ID;
+	}
+
 	/**
-	 * Get Job Permerlink
-	 *
-	 *    return link to detail of the paypal.
+	 * Get Permerlink
 	 *
 	 * @return string
-	 * @since 1.0
-	 *
 	 */
 	public function get_link() {
 		return get_permalink( $this->ID );
@@ -152,8 +146,6 @@ class Paypal_Entity {
 	 * Return create post with format by args,it support type: ago, date
 	 *
 	 * @return string
-	 * @since 1.0
-	 *
 	 */
 	public function get_post_date( $d = '' ) {
 		$get_date = $this->post_date;
@@ -172,8 +164,6 @@ class Paypal_Entity {
 	 * Return create post with format by args,it support type: ago, date
 	 *
 	 * @return string
-	 * @since 1.0
-	 *
 	 */
 	public function get_updated_date( $d = '' ) {
 		$get_date = $this->post_modified;
@@ -185,7 +175,6 @@ class Paypal_Entity {
 
 		return $get_date;
 	}
-
 
 	/**
 	 * Gets meta box value
@@ -201,23 +190,35 @@ class Paypal_Entity {
 		return get_post_meta( $this->ID, GGMP_METABOX_PREFIX . $key, $single );
 	}
 
+	public function is_valid() {
+		// TODO:...
+		return true;
+	}
+
 	public function get_status_code() {
 		return $this->post_status;
 	}
 
 	public function get_limit_per_day() {
-		return $this->get_meta( 'limit_money_per_day' );
+		$limit = $this->get_meta( 'limit_money_per_day' );
+
+		return $limit ? (float) $limit : (float) ggmp_get_option( 'limit_money_per_day', 300 );
 	}
 
-	/**
-	 *    Display Sidebar on left side and next is main content
-	 *
-	 * @return string
-	 * @since 1.0
-	 *
-	 */
-	public function get_posted_ago() {
-		return human_time_diff( get_post_time( 'U' ), current_time( 'timestamp' ) ) . " " . esc_html__( 'ago', 'ggmp' );
+	public function get_api_username() {
+		return $this->get_meta( 'api_username' );
+	}
+
+	public function get_api_password() {
+		return $this->get_meta( 'api_password' );
+	}
+
+	public function get_api_signature() {
+		return $this->get_meta( 'api_signature' );
+	}
+
+	public function get_api_certificate() {
+		return $this->get_meta( 'api_certificate' );
 	}
 
 	public function get_sandbox_api_username() {
@@ -230,5 +231,54 @@ class Paypal_Entity {
 
 	public function get_sandbox_api_signature() {
 		return $this->get_meta( 'sandbox_api_signature' );
+	}
+
+	public function get_sandbox_api_certificate() {
+		return $this->get_meta( 'sandbox_api_certificate' );
+	}
+
+	public function get_stats() {
+		$stats = $this->get_meta( 'stats' );
+
+		return $stats ? $stats : [];
+	}
+
+	public function get_deposit( $date = '' ) {
+		if ( ! $date ) {
+			$date = date( 'm-d-Y', time() );
+		}
+
+		$stats = $this->get_stats();
+		if ( ! isset( $stats[ $date ] ) ) {
+			return 0;
+		}
+
+		return $stats[ $date ]['deposit'] ? (float) $stats[ $date ]['deposit'] : 0;
+	}
+
+	public function get_count_order( $date = '' ) {
+		if ( ! $date ) {
+			$date = date( 'm-d-Y', time() );
+		}
+
+		$stats = $this->get_stats();
+		if ( ! isset( $stats[ $date ] ) ) {
+			return 0;
+		}
+
+		return $stats[ $date ]['count_order'] ? absint( $stats[ $date ]['count_order'] ) : 0;
+	}
+
+	public function get_orders( $date = '' ) {
+		if ( ! $date ) {
+			$date = date( 'm-d-Y', time() );
+		}
+
+		$stats = $this->get_stats();
+		if ( ! isset( $stats[ $date ] ) ) {
+			return [];
+		}
+
+		return $stats[ $date ]['orders'] ? $stats[ $date ]['orders'] : [];
 	}
 }

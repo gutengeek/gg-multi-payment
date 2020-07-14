@@ -57,6 +57,13 @@ class Paypal_Account_Metabox extends Metabox {
 		$prefix = GGMP_METABOX_PREFIX;
 
 		$settings = [
+			[
+				'name'        => esc_html__( 'Priority', 'ggmp' ),
+				'id'          => $prefix . 'priority',
+				'type'        => 'text_number',
+				'description' => esc_html__( 'Priority for this account. The accounts will be taken based on higher priority.', 'ggmp' ),
+				'default'     => 1,
+			],
 			// Live
 			[
 				'name'        => esc_html__( 'Live API Credentials', 'ggmp' ),

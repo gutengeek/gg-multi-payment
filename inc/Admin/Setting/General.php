@@ -34,7 +34,7 @@ class General extends Core\Metabox {
 				'id'          => 'limit_money_per_day',
 				'name'        => esc_html__( 'Default limit money per day', 'ggmp' ),
 				'type'        => 'text_number',
-				'default'     => '200',
+				'default'     => '300',
 				'description' => esc_html__( 'Default limit money per day', 'ggmp' ),
 			],
 		];

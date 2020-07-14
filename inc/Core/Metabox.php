@@ -264,7 +264,6 @@ abstract class Metabox {
 	 * @return array
 	 */
 	public function save_term_options( $term_id ) {
-
 		$update_options = $this->get_needed_update_options();
 
 		if ( $update_options ) {
@@ -285,7 +284,6 @@ abstract class Metabox {
 			return;
 		}
 
-		$return    = '';
 		$sanitizer = new Sanitize();
 
 		$sanitizer->set_data( $data );

@@ -46,15 +46,20 @@ function ggmp_paypal( $id ) {
 	return new \GGMP\Common\Model\Entity\Paypal_Entity( $id );
 }
 
-/**
- * Get valid paypal account.
- */
-function ggmp_get_valid_paypal_account() {
-	$accounts = Paypal_Query::get_paypal_accounts();
+if ( ! function_exists( 'ggmp_move_write_log' ) ) {
 
-	foreach ( $accounts as $account ) {
-		$paypal_account = ggmp_paypal( $account->ID );
+	/**
+	 * Write log.
+	 *
+	 * @param $log
+	 */
+	function ggmp_move_write_log( $log ) {
+		if ( true === WP_DEBUG ) {
+			if ( is_array( $log ) || is_object( $log ) ) {
+				error_log( print_r( $log, true ) );
+			} else {
+				error_log( $log );
+			}
+		}
 	}
-
-	return null;
 }
