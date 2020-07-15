@@ -131,6 +131,10 @@ class Paypal_Entity {
 		return $this->ID;
 	}
 
+	public function get_name() {
+		return $this->post_title;
+	}
+
 	/**
 	 * Get Permerlink
 	 *
@@ -243,9 +247,13 @@ class Paypal_Entity {
 		return $stats ? $stats : [];
 	}
 
+	public function get_current_date_stats() {
+		return date( 'Y-m-d', time() );
+	}
+
 	public function get_deposit( $date = '' ) {
 		if ( ! $date ) {
-			$date = date( 'm-d-Y', time() );
+			$date = $this->get_current_date_stats();
 		}
 
 		$stats = $this->get_stats();
@@ -258,7 +266,7 @@ class Paypal_Entity {
 
 	public function get_count_order( $date = '' ) {
 		if ( ! $date ) {
-			$date = date( 'm-d-Y', time() );
+			$date = $this->get_current_date_stats();
 		}
 
 		$stats = $this->get_stats();
@@ -271,7 +279,7 @@ class Paypal_Entity {
 
 	public function get_orders( $date = '' ) {
 		if ( ! $date ) {
-			$date = date( 'm-d-Y', time() );
+			$date = $this->get_current_date_stats();
 		}
 
 		$stats = $this->get_stats();

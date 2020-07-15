@@ -98,7 +98,7 @@ class Hook {
 		$limit_per_day = $account->get_limit_per_day();
 		$stats         = $account->get_stats();
 
-		$today = date( 'm-d-Y', time() );
+		$today = $account->get_current_date_stats();
 
 		if ( ! isset( $stats[ $today ] ) ) {
 			$stats[ $today ] = [
