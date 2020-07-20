@@ -246,11 +246,88 @@ class Stripe_Hook {
 		if ( $request_body ) {
 			$notification = json_decode( $request_body );
 
-			if ( $notification->data && $notification->data->object && $notification->data->object->id ) {
-				$order = \WC_Stripe_Helper::get_order_by_source_id( $notification->data->object->id );
+			if ( $notification->type && $notification->data && $notification->data->object && $notification->data->object->id ) {
+				$order_id = 0;
+				switch ( $notification->type ) {
+					case 'source.chargeable':
+						if ( 'card' === $notification->data->object->type || 'sepa_debit' === $notification->data->object->type || 'three_d_secure' === $notification->data->object->type ) {
+							$order_id = 0;
+						} else {
+							$order_id = static::get_order_id_by_source_id( $notification->data->object->id );
+						}
 
-				if ( $order ) {
-					$order_id          = $order->get_id();
+						break;
+
+					case 'source.canceled':
+						$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
+
+						// If can't find order by charge ID, try source ID.
+						if ( ! $order_id ) {
+							$order_id = static::get_order_id_by_source_id( $notification->data->object->id );
+						}
+						break;
+
+					case 'charge.succeeded':
+						// Ignore the notification for charges, created through PaymentIntents.
+						if ( isset( $notification->data->object->payment_intent ) && $notification->data->object->payment_intent ) {
+							$order_id = 0;
+						} else {
+							// The following payment methods are synchronous so does not need to be handle via webhook.
+							if ( ( isset( $notification->data->object->source->type ) && 'card' === $notification->data->object->source->type ) || ( isset( $notification->data->object->source->type ) && 'three_d_secure' === $notification->data->object->source->type ) ) {
+								$order_id = 0;
+							} else {
+								$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
+							}
+						}
+						break;
+
+					case 'charge.failed':
+						$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
+						break;
+
+					case 'charge.captured':
+						$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
+						break;
+
+					case 'charge.dispute.created':
+						$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
+						break;
+
+					case 'charge.refunded':
+						$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
+						break;
+
+					case 'review.opened':
+						if ( isset( $notification->data->object->payment_intent ) ) {
+							$order_id = static::get_order_id_by_intent_id( $notification->data->object->payment_intent );
+						} else {
+							$order_id = static::get_order_id_by_charge_id( $notification->data->object->charge );
+						}
+						break;
+
+					case 'review.closed':
+						if ( isset( $notification->data->object->payment_intent ) ) {
+							$order_id = static::get_order_id_by_intent_id( $notification->data->object->payment_intent );
+						} else {
+							$order_id = static::get_order_id_by_charge_id( $notification->data->object->charge );
+						}
+						break;
+
+					case 'payment_intent.succeeded':
+					case 'payment_intent.payment_failed':
+					case 'payment_intent.amount_capturable_updated':
+						$intent   = $notification->data->object;
+						$order_id = static::get_order_id_by_intent_id( $intent->id );
+						break;
+
+					case 'setup_intent.succeeded':
+					case 'setup_intent.setup_failed':
+						$intent   = $notification->data->object;
+						$order_id = static::get_order_id_by_setup_intent_id( $intent->id );
+						break;
+				}
+
+				if ( $order_id ) {
 					$stripe_account_id = get_post_meta( $order_id, '_stripe_account_id', true );
 					if ( $stripe_account_id ) {
 						$account = ggmp_stripe( $stripe_account_id );
@@ -265,6 +342,81 @@ class Stripe_Hook {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Gets the order by Stripe charge ID.
+	 *
+	 * @param string $charge_id
+	 */
+	public static function get_order_id_by_charge_id( $charge_id ) {
+		global $wpdb;
+
+		if ( empty( $charge_id ) ) {
+			return false;
+		}
+
+		$order_id = $wpdb->get_var( $wpdb->prepare( "SELECT DISTINCT ID FROM $wpdb->posts as posts LEFT JOIN $wpdb->postmeta as meta ON posts.ID = meta.post_id WHERE meta.meta_value = %s AND meta.meta_key = %s",
+			$charge_id, '_transaction_id' ) );
+
+		if ( ! empty( $order_id ) ) {
+			return $order_id;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Gets the order by Stripe source ID.
+	 *
+	 * @param string $source_id
+	 */
+	public static function get_order_id_by_source_id( $source_id ) {
+		global $wpdb;
+
+		$order_id = $wpdb->get_var( $wpdb->prepare( "SELECT DISTINCT ID FROM $wpdb->posts as posts LEFT JOIN $wpdb->postmeta as meta ON posts.ID = meta.post_id WHERE meta.meta_value = %s AND meta.meta_key = %s",
+			$source_id, '_stripe_source_id' ) );
+
+		if ( ! empty( $order_id ) ) {
+			return $order_id;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Gets the order by Stripe PaymentIntent ID.
+	 *
+	 * @param string $intent_id The ID of the intent.
+	 */
+	public static function get_order_id_by_intent_id( $intent_id ) {
+		global $wpdb;
+
+		$order_id = $wpdb->get_var( $wpdb->prepare( "SELECT DISTINCT ID FROM $wpdb->posts as posts LEFT JOIN $wpdb->postmeta as meta ON posts.ID = meta.post_id WHERE meta.meta_value = %s AND meta.meta_key = %s",
+			$intent_id, '_stripe_intent_id' ) );
+
+		if ( ! empty( $order_id ) ) {
+			return $order_id;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Gets the order by Stripe SetupIntent ID.
+	 *
+	 * @param string $intent_id The ID of the intent.
+	 */
+	public static function get_order_id_by_setup_intent_id( $intent_id ) {
+		global $wpdb;
+
+		$order_id = $wpdb->get_var( $wpdb->prepare( "SELECT DISTINCT ID FROM $wpdb->posts as posts LEFT JOIN $wpdb->postmeta as meta ON posts.ID = meta.post_id WHERE meta.meta_value = %s AND meta.meta_key = %s", $intent_id, '_stripe_setup_intent' ) );
+
+		if ( ! empty( $order_id ) ) {
+			return $order_id;
+		}
+
+		return false;
 	}
 
 	/**
