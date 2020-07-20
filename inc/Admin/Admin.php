@@ -98,8 +98,8 @@ class Admin {
 		 */
 		$suffix = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ? '.min' : '';
 		wp_enqueue_script( 'select2', GGMP_URL . 'assets/3rd/select2/js/select2.min.js', null, '4.0.7', false );
-		wp_enqueue_script( 'clipboard', GGMP_URL . 'assets/3rd/clipboard.min.js', [], '2.0.4', false );
-		wp_enqueue_script( $this->plugin_name . '_admin', GGMP_URL . 'assets/js/admin' . $suffix . '.js', [ 'jquery-ui-sortable' ], $this->version, false );
+		// wp_enqueue_script( 'clipboard', GGMP_URL . 'assets/3rd/clipboard.min.js', [], '2.0.4', false );
+		// wp_enqueue_script( $this->plugin_name . '_admin', GGMP_URL . 'assets/js/admin' . $suffix . '.js', [ 'jquery-ui-sortable' ], $this->version, false );
 
 		do_action( 'ggmp_admin_enqueue_scripts', $this );
 	}

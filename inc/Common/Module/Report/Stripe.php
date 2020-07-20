@@ -3,12 +3,12 @@
 namespace GGMP\Common\Module\Report;
 
 
-use GGMP\Common\Model\Query\Paypal_Query;
+use GGMP\Common\Model\Query\Stripe_Query;
 
 /**
  * WC_Report_Sales_By_Date
  */
-class Paypal extends \WC_Admin_Report {
+class Stripe extends \WC_Admin_Report {
 
 	/**
 	 * Chart colors.
@@ -38,8 +38,8 @@ class Paypal extends \WC_Admin_Report {
 	}
 
 	public function get_account_id() {
-		if ( isset( $_GET['paypal_account'] ) ) {
-			return absint( $_GET['paypal_account'] );
+		if ( isset( $_GET['stripe_account'] ) ) {
+			return absint( $_GET['stripe_account'] );
 		}
 
 		$accounts = $this->get_accounts();
@@ -69,7 +69,7 @@ class Paypal extends \WC_Admin_Report {
 						'function' => '',
 						'name'     => 'post_date',
 					],
-					'_paypal_account_id' => [
+					'_stripe_account_id' => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -77,7 +77,7 @@ class Paypal extends \WC_Admin_Report {
 				],
 				'where'        => [
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -110,7 +110,7 @@ class Paypal extends \WC_Admin_Report {
 						'function' => '',
 						'name'     => 'post_date',
 					],
-					'_paypal_account_id' => [
+					'_stripe_account_id' => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -123,7 +123,7 @@ class Paypal extends \WC_Admin_Report {
 						'operator' => '=',
 					],
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -152,7 +152,7 @@ class Paypal extends \WC_Admin_Report {
 						'function' => '',
 						'name'     => 'post_date',
 					],
-					'_paypal_account_id' => [
+					'_stripe_account_id' => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -165,7 +165,7 @@ class Paypal extends \WC_Admin_Report {
 						'operator' => '=',
 					],
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -192,7 +192,7 @@ class Paypal extends \WC_Admin_Report {
 							'function'        => 'SUM',
 							'name'            => 'order_item_count',
 						],
-						'_paypal_account_id' => [
+						'_stripe_account_id' => [
 							'type'     => 'meta',
 							'function' => '',
 							'name'     => 'account',
@@ -205,7 +205,7 @@ class Paypal extends \WC_Admin_Report {
 							'operator' => '=',
 						],
 						[
-							'key'      => 'meta__paypal_account_id.meta_value',
+							'key'      => 'meta__stripe_account_id.meta_value',
 							'value'    => $this->get_account_id(),
 							'operator' => '=',
 						],
@@ -249,7 +249,7 @@ class Paypal extends \WC_Admin_Report {
 						'function' => '',
 						'name'     => 'post_date',
 					],
-					'_paypal_account_id'  => [
+					'_stripe_account_id'  => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -257,7 +257,7 @@ class Paypal extends \WC_Admin_Report {
 				],
 				'where'        => [
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -303,7 +303,7 @@ class Paypal extends \WC_Admin_Report {
 						'function' => '',
 						'name'     => 'post_date',
 					],
-					'_paypal_account_id'  => [
+					'_stripe_account_id'  => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -311,7 +311,7 @@ class Paypal extends \WC_Admin_Report {
 				],
 				'where'               => [
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -384,7 +384,7 @@ class Paypal extends \WC_Admin_Report {
 						'name'      => 'order_item_count',
 						'join_type' => 'LEFT',
 					],
-					'_paypal_account_id'  => [
+					'_stripe_account_id'  => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -392,7 +392,7 @@ class Paypal extends \WC_Admin_Report {
 				],
 				'where'               => [
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -466,7 +466,7 @@ class Paypal extends \WC_Admin_Report {
 						'name'      => 'order_item_count',
 						'join_type' => 'LEFT',
 					],
-					'_paypal_account_id'  => [
+					'_stripe_account_id'  => [
 						'type'     => 'meta',
 						'function' => '',
 						'name'     => 'account',
@@ -474,7 +474,7 @@ class Paypal extends \WC_Admin_Report {
 				],
 				'where'               => [
 					[
-						'key'      => 'meta__paypal_account_id.meta_value',
+						'key'      => 'meta__stripe_account_id.meta_value',
 						'value'    => $this->get_account_id(),
 						'operator' => '=',
 					],
@@ -665,7 +665,7 @@ class Paypal extends \WC_Admin_Report {
 	}
 
 	public function get_accounts() {
-		return Paypal_Query::get_paypal_accounts();
+		return Stripe_Query::get_stripe_accounts();
 	}
 
 	/**
@@ -1030,10 +1030,10 @@ class Paypal extends \WC_Admin_Report {
                             </form>
                         </li>
                         <li style="padding: 10px;">
-                            <select name="paypal_account" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-								<?php $current_account = isset( $_GET['paypal_account'] ) ? absint( $_GET['paypal_account'] ) : 0; ?>
+                            <select name="stripe_account" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+								<?php $current_account = isset( $_GET['stripe_account'] ) ? absint( $_GET['stripe_account'] ) : 0; ?>
 								<?php foreach ( $this->get_accounts() as $account ) : ?>
-                                    <option value="<?php echo esc_url( add_query_arg( 'paypal_account', $account->ID ) ); ?>" <?php selected( $current_account, $account->ID, true ); ?>>
+                                    <option value="<?php echo esc_url( add_query_arg( 'stripe_account', $account->ID ) ); ?>" <?php selected( $current_account, $account->ID, true ); ?>>
 										<?php echo esc_html( $account->post_title ); ?>
                                     </option>
 								<?php endforeach; ?>

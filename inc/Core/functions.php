@@ -46,14 +46,24 @@ function ggmp_paypal( $id ) {
 	return new \GGMP\Common\Model\Entity\Paypal_Entity( $id );
 }
 
-if ( ! function_exists( 'ggmp_move_write_log' ) ) {
+/**
+ * Create a new Paypal object.
+ *
+ * @param $id
+ * @return \GGMP\Common\Model\Entity\Stripe_Entity
+ */
+function ggmp_stripe( $id ) {
+	return new \GGMP\Common\Model\Entity\Stripe_Entity( $id );
+}
+
+if ( ! function_exists( 'ggmp_write_log' ) ) {
 
 	/**
 	 * Write log.
 	 *
 	 * @param $log
 	 */
-	function ggmp_move_write_log( $log ) {
+	function ggmp_write_log( $log ) {
 		if ( true === WP_DEBUG ) {
 			if ( is_array( $log ) || is_object( $log ) ) {
 				error_log( print_r( $log, true ) );

@@ -5,10 +5,10 @@ namespace GGMP\Common\Model\Entity;
 use WP_Error;
 use WP_Post;
 
-class Paypal_Entity {
+class Stripe_Entity {
 
 	/**
-	 * The paypal account ID
+	 * The stripe account ID
 	 */
 	public $ID = 0;
 
@@ -40,27 +40,27 @@ class Paypal_Entity {
 	public $filter;
 
 	public function __construct( $_id ) {
-		$paypal    = WP_Post::get_instance( $_id );
+		$stripe    = WP_Post::get_instance( $_id );
 		$this->ID  = $_id;
 
-		return $this->setup( $paypal );
+		return $this->setup( $stripe );
 	}
 
 	/**
-	 * Magic __get function to dispatch a call to retrieve a private paypal
+	 * Magic __get function to dispatch a call to retrieve a private stripe
 	 */
 	public function __get( $key ) {
 		if ( method_exists( $this, 'get_' . $key ) ) {
 			return call_user_func( [ $this, 'get_' . $key ] );
 		} else {
-			return new WP_Error( 'ggmp-invalid-paypal', sprintf( esc_html__( 'Can\'t get paypal %s', 'ggmp' ), $key ) );
+			return new WP_Error( 'ggmp-invalid-stripe', sprintf( esc_html__( 'Can\'t get stripe %s', 'ggmp' ), $key ) );
 		}
 	}
 
 	/**
-	 * Creates a paypal
+	 * Creates a stripe
 	 *
-	 * @param array $data Array of attributes for a paypal
+	 * @param array $data Array of attributes for a stripe
 	 * @return mixed  false if data isn't passed and class not instantiated for creation, or New Download ID
 	 * @since 1.0
 	 */
@@ -70,15 +70,15 @@ class Paypal_Entity {
 		}
 
 		$defaults = [
-			'post_type'   => 'ggmp_paypal',
+			'post_type'   => 'ggmp_stripe',
 			'post_status' => 'draft',
-			'post_title'  => esc_html__( 'New Paypal', 'ggmp' ),
+			'post_title'  => esc_html__( 'New Stripe', 'ggmp' ),
 		];
 
 		$args = wp_parse_args( $data, $defaults );
 
 		/**
-		 * Fired before a paypal is created
+		 * Fired before a stripe is created
 		 *
 		 * @param array $args The post object arguments used for creation.
 		 */
@@ -86,40 +86,40 @@ class Paypal_Entity {
 
 		$id = wp_insert_post( $args, true );
 
-		$paypal = WP_Post::get_instance( $id );
+		$stripe = WP_Post::get_instance( $id );
 
 		/**
-		 * Fired after a paypal is created
+		 * Fired after a stripe is created
 		 *
 		 * @param int   $id   The post ID of the created item.
 		 * @param array $args The post object arguments used for creation.
 		 */
 		do_action( 'ggmp_post_create', $id, $args );
 
-		return $this->setup( $paypal );
+		return $this->setup( $stripe );
 
 	}
 
 	/**
-	 * Given the paypal data, let's set the variables
+	 * Given the stripe data, let's set the variables
 	 *
-	 * @param WP_Post $paypal The WP_Post object for paypal.
+	 * @param WP_Post $stripe The WP_Post object for stripe.
 	 * @return bool         If the setup was successful or not
 	 */
-	private function setup( $paypal ) {
-		if ( ! is_object( $paypal ) ) {
+	private function setup( $stripe ) {
+		if ( ! is_object( $stripe ) ) {
 			return false;
 		}
 
-		if ( ! $paypal instanceof WP_Post ) {
+		if ( ! $stripe instanceof WP_Post ) {
 			return false;
 		}
 
-		if ( 'ggmp_paypal' !== $paypal->post_type ) {
+		if ( 'ggmp_stripe' !== $stripe->post_type ) {
 			return false;
 		}
 
-		foreach ( $paypal as $key => $value ) {
+		foreach ( $stripe as $key => $value ) {
 			$this->$key = $value;
 		}
 
@@ -208,36 +208,28 @@ class Paypal_Entity {
 		return $limit ? (float) $limit : (float) ggmp_get_option( 'limit_money_per_day', 300 );
 	}
 
-	public function get_api_username() {
-		return $this->get_meta( 'api_username' );
+	public function get_publishable_key() {
+		return $this->get_meta( 'publishable_key' );
 	}
 
-	public function get_api_password() {
-		return $this->get_meta( 'api_password' );
+	public function get_secret_key() {
+		return $this->get_meta( 'secret_key' );
 	}
 
-	public function get_api_signature() {
-		return $this->get_meta( 'api_signature' );
+	public function get_webhook_secret() {
+		return $this->get_meta( 'webhook_secret' );
 	}
 
-	public function get_api_certificate() {
-		return $this->get_meta( 'api_certificate' );
+	public function get_test_publishable_key() {
+		return $this->get_meta( 'test_publishable_key' );
 	}
 
-	public function get_sandbox_api_username() {
-		return $this->get_meta( 'sandbox_api_username' );
+	public function get_test_secret_key() {
+		return $this->get_meta( 'test_secret_key' );
 	}
 
-	public function get_sandbox_api_password() {
-		return $this->get_meta( 'sandbox_api_password' );
-	}
-
-	public function get_sandbox_api_signature() {
-		return $this->get_meta( 'sandbox_api_signature' );
-	}
-
-	public function get_sandbox_api_certificate() {
-		return $this->get_meta( 'sandbox_api_certificate' );
+	public function get_test_webhook_secret() {
+		return $this->get_meta( 'test_webhook_secret' );
 	}
 
 	public function get_stats() {

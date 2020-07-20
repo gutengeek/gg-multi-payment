@@ -45,7 +45,7 @@ class Report {
 	 * @param string $name
 	 */
 	public static function get_stripe_report( $name ) {
-		$report = new Paypal();
+		$report = new Stripe();
 		$report->output_report();
 	}
 }

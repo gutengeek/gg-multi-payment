@@ -40,7 +40,7 @@ class Posttypes {
 			'add_new'            => esc_html__( 'Add New PayPal Account', 'ggmp' ),
 			'add_new_item'       => esc_html__( 'Add New PayPal Account', 'ggmp' ),
 			'edit_item'          => esc_html__( 'Edit PayPal Account', 'ggmp' ),
-			'new_item'           => esc_html__( 'New CandPayPal Accountidate', 'ggmp' ),
+			'new_item'           => esc_html__( 'New PayPal Account', 'ggmp' ),
 			'all_items'          => esc_html__( 'PayPal Accounts', 'ggmp' ),
 			'view_item'          => esc_html__( 'View PayPal Account', 'ggmp' ),
 			'search_items'       => esc_html__( 'Search PayPal Account', 'ggmp' ),
@@ -54,7 +54,7 @@ class Posttypes {
 
 		register_post_type( 'ggmp_paypal',
 			apply_filters( 'ggmp_paypal_post_type_parameters', [
-				'labels'             => $labels,
+				'labels'              => $labels,
 				'public'              => false,
 				'hierarchical'        => false,
 				'exclude_from_search' => true,
@@ -84,7 +84,7 @@ class Posttypes {
 			'add_new'            => esc_html__( 'Add New Stripe Account', 'ggmp' ),
 			'add_new_item'       => esc_html__( 'Add New Stripe Account', 'ggmp' ),
 			'edit_item'          => esc_html__( 'Edit Stripe Account', 'ggmp' ),
-			'new_item'           => esc_html__( 'New CandStripe Accountidate', 'ggmp' ),
+			'new_item'           => esc_html__( 'New Stripe Account', 'ggmp' ),
 			'all_items'          => esc_html__( 'Stripe Accounts', 'ggmp' ),
 			'view_item'          => esc_html__( 'View Stripe Account', 'ggmp' ),
 			'search_items'       => esc_html__( 'Search Stripe Account', 'ggmp' ),
@@ -98,7 +98,7 @@ class Posttypes {
 
 		register_post_type( 'ggmp_stripe',
 			apply_filters( 'ggmp_stripe_post_type_parameters', [
-				'labels'             => $labels,
+				'labels'              => $labels,
 				'public'              => false,
 				'hierarchical'        => false,
 				'exclude_from_search' => true,

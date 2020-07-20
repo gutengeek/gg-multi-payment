@@ -31,6 +31,18 @@ class General extends Core\Metabox {
 	public function get_settings() {
 		$fields = [
 			[
+				'id'      => 'enable_paypal',
+				'name'    => esc_html__( 'Enable PayPal Routing', 'ggmp' ),
+				'type'    => 'switch',
+				'default' => 'on',
+			],
+			[
+				'id'      => 'enable_stripe',
+				'name'    => esc_html__( 'Enable Stripe Routing', 'ggmp' ),
+				'type'    => 'switch',
+				'default' => 'on',
+			],
+			[
 				'id'          => 'limit_money_per_day',
 				'name'        => esc_html__( 'Default limit money per day', 'ggmp' ),
 				'type'        => 'text_number',

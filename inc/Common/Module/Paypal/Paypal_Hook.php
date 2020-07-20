@@ -1,5 +1,5 @@
 <?php
-namespace GGMP\Core;
+namespace GGMP\Common\Module\Paypal;
 
 use GGMP\Common\Model\Query\Paypal_Query;
 
@@ -14,11 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package    GGMP
  * @subpackage GGMP/controllers
  */
-class Hook {
+class Paypal_Hook {
 	/**
 	 * Hook constructor.
 	 */
 	public function __construct() {
+		if ( 'on' !== ggmp_get_option( 'enable_paypal', 'on' ) ) {
+			return;
+		}
+
 		add_filter( 'option_woocommerce_ppec_paypal_settings', [ $this, 'woocommerce_ppec_paypal_settings', ], 10, 1 );
 		add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
 		add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );

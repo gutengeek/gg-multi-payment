@@ -9,9 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 use GGMP\Admin\Admin;
 use GGMP\Admin\Metabox as Metabox;
 use GGMP\Common\Interfaces\Intergration;
+use GGMP\Common\Module\Paypal\Paypal_Hook;
+use GGMP\Common\Module\Stripe\Stripe_Hook;
 use GGMP\Common\Module\Report\Report;
 use GGMP\Common\Posttypes;
-use GGMP\Frontend\Enqueue;
 use GGMP\Libraries\Form\Form;
 
 /**
@@ -80,8 +81,6 @@ class Init {
 		$this->define_core_hook();
 
 		// add_action( 'wp_loaded', [$this, 'define_core_hook'] );
-
-		$this->define_frontend_hooks();
 
 		$this->define_intergrations();
 
@@ -237,6 +236,7 @@ class Init {
 		// Register post type metabox
 		$metaboxes = [
 			'admin/metabox/ggmp_paypal' => Metabox\Paypal_Account_Metabox::class,
+			'admin/metabox/ggmp_stripe' => Metabox\Stripe_Account_Metabox::class,
 		];
 
 		// register metaxbox for custom post type ;
@@ -277,23 +277,8 @@ class Init {
 	}
 
 	public function define_core_hook() {
-		new Hook();
-	}
-
-	/**
-	 * Register all of the hooks related to the admin area functionality of the plugin.
-	 *
-	 * @access    public
-	 */
-	public function define_frontend_hooks() {
-		$plugin_public = new Enqueue( $this->get_plugin_name(),
-			$this->get_version(), $this->get_plugin_text_domain()
-		);
-
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
-		$this->loader->add_action( 'init', $this, 'define_controllers', 3 );
+		new Paypal_Hook();
+		new Stripe_Hook();
 	}
 
 	/**
