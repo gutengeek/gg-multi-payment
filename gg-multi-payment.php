@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Define Constants
  */
 define( 'GGMP', 'ggmp' );
-define( 'GGMP_VERSION', '1.0.2' );
+define( 'GGMP_VERSION', '1.0.0' );
 define( 'GGMP_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GGMP_URL', plugin_dir_url( __FILE__ ) );
 define( 'GGMP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
