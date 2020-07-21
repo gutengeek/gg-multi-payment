@@ -62,7 +62,6 @@ class Stripe_Hook {
 		$this->testmode        = ( ! empty( $this->stripe_settings['testmode'] ) && 'yes' === $this->stripe_settings['testmode'] ) ? true : false;
 
 		add_filter( 'option_woocommerce_stripe_settings', [ $this, 'woocommerce_stripe_settings', ], 10, 1 );
-		// add_filter( 'option_woocommerce_stripe_settings', [ $this, 'woocommerce_stripe_settings_in_cart', ], 10, 1 );
 		add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
 		add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
 		add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
@@ -100,55 +99,6 @@ class Stripe_Hook {
 		}
 
 		return $params;
-	}
-
-	/**
-	 * Change stripe settings.
-	 *
-	 * @param $value
-	 * @return array
-	 */
-	public function woocommerce_stripe_settings_in_cart( $value ) {
-		if ( ! function_exists( 'woocommerce_gateway_stripe_init' ) || is_admin() ) {
-			return $value;
-		}
-
-		$session        = new \WC_Session_Handler();
-		$session_cookie = $session->get_session_cookie();
-		if ( $session_cookie ) {
-			if ( isset( $session_cookie[0] ) && $session_cookie[0] ) {
-				$session_data = $session->get_session( $session_cookie[0] );
-
-				if ( isset( $session_data['cart_totals'] ) && $session_data['cart_totals'] ) {
-					$cart_total = maybe_unserialize( $session_data['cart_totals'] );
-					if ( isset( $cart_total['total'] ) ) {
-						$total = $cart_total['total'];
-						if ( $total ) {
-							$accounts = Stripe_Query::get_stripe_accounts();
-							if ( $accounts ) {
-								foreach ( $accounts as $account ) {
-									$account       = ggmp_stripe( $account->ID );
-									$deposit       = $account->get_deposit();
-									$limit_per_day = $account->get_limit_per_day();
-
-									if ( $account->is_valid() && ( $deposit + $total ) <= $limit_per_day ) {
-										$value['test_publishable_key'] = $account->get_test_publishable_key();
-										$value['publishable_key']      = $account->get_publishable_key();
-										$value['test_secret_key']      = $account->get_test_secret_key();
-										$value['secret_key']           = $account->get_secret_key();
-										$value['test_webhook_secret']  = $account->get_test_webhook_secret();
-										$value['webhook_secret']       = $account->get_webhook_secret();
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return $value;
 	}
 
 	/**
