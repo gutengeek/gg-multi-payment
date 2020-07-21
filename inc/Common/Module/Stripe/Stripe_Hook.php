@@ -200,12 +200,7 @@ class Stripe_Hook {
 				$order_id = 0;
 				switch ( $notification->type ) {
 					case 'source.chargeable':
-						if ( 'card' === $notification->data->object->type || 'sepa_debit' === $notification->data->object->type || 'three_d_secure' === $notification->data->object->type ) {
-							$order_id = 0;
-						} else {
-							$order_id = static::get_order_id_by_source_id( $notification->data->object->id );
-						}
-
+						$order_id = static::get_order_id_by_source_id( $notification->data->object->id );
 						break;
 
 					case 'source.canceled':
@@ -218,17 +213,7 @@ class Stripe_Hook {
 						break;
 
 					case 'charge.succeeded':
-						// Ignore the notification for charges, created through PaymentIntents.
-						if ( isset( $notification->data->object->payment_intent ) && $notification->data->object->payment_intent ) {
-							$order_id = 0;
-						} else {
-							// The following payment methods are synchronous so does not need to be handle via webhook.
-							if ( ( isset( $notification->data->object->source->type ) && 'card' === $notification->data->object->source->type ) || ( isset( $notification->data->object->source->type ) && 'three_d_secure' === $notification->data->object->source->type ) ) {
-								$order_id = 0;
-							} else {
-								$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
-							}
-						}
+						$order_id = static::get_order_id_by_charge_id( $notification->data->object->id );
 						break;
 
 					case 'charge.failed':
