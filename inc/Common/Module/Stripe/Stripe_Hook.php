@@ -181,7 +181,7 @@ class Stripe_Hook {
 	 * Change stripe settings.
 	 *
 	 * @param $value
-	 * @return array
+	 * @return mixed|array|void
 	 */
 	public function woocommerce_stripe_settings( $value ) {
 		if ( ! function_exists( 'woocommerce_gateway_stripe_init' ) ) {
@@ -201,6 +201,12 @@ class Stripe_Hook {
 				switch ( $notification->type ) {
 					case 'source.chargeable':
 						$order_id = static::get_order_id_by_source_id( $notification->data->object->id );
+
+						if ( ! $order_id && ( 'card' === $notification->data->object->type || 'sepa_debit' === $notification->data->object->type || 'three_d_secure' === $notification->data->object->type ) ) {
+							return;
+							status_header( 200 );
+						}
+
 						break;
 
 					case 'source.canceled':
@@ -345,7 +351,8 @@ class Stripe_Hook {
 	public static function get_order_id_by_setup_intent_id( $intent_id ) {
 		global $wpdb;
 
-		$order_id = $wpdb->get_var( $wpdb->prepare( "SELECT DISTINCT ID FROM $wpdb->posts as posts LEFT JOIN $wpdb->postmeta as meta ON posts.ID = meta.post_id WHERE meta.meta_value = %s AND meta.meta_key = %s", $intent_id, '_stripe_setup_intent' ) );
+		$order_id = $wpdb->get_var( $wpdb->prepare( "SELECT DISTINCT ID FROM $wpdb->posts as posts LEFT JOIN $wpdb->postmeta as meta ON posts.ID = meta.post_id WHERE meta.meta_value = %s AND meta.meta_key = %s",
+			$intent_id, '_stripe_setup_intent' ) );
 
 		if ( ! empty( $order_id ) ) {
 			return $order_id;
