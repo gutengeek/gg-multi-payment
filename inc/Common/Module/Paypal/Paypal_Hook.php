@@ -50,28 +50,28 @@ class Paypal_Hook {
 					$cart_total = maybe_unserialize( $session_data['cart_totals'] );
 					if ( isset( $cart_total['total'] ) ) {
 						$total = $cart_total['total'];
-                        if ( $total ) {
-	                        $accounts = Paypal_Query::get_paypal_accounts();
-	                        if ( $accounts ) {
-		                        foreach ( $accounts as $account ) {
-			                        $account = ggmp_paypal( $account->ID );
-			                        $deposit = $account->get_deposit();
-			                        $limit_per_day = $account->get_limit_per_day();
+						if ( $total ) {
+							$accounts = Paypal_Query::get_paypal_accounts();
+							if ( $accounts ) {
+								foreach ( $accounts as $account ) {
+									$account       = ggmp_paypal( $account->ID );
+									$deposit       = $account->get_deposit();
+									$limit_per_day = $account->get_limit_per_day();
 
-			                        if ( $account->is_valid() && ( $deposit + $total ) <= $limit_per_day ) {
-				                        $value['api_username']            = $account->get_api_username();
-				                        $value['api_password']            = $account->get_api_password();
-				                        $value['api_signature']           = $account->get_api_signature();
-				                        $value['api_certificate']         = $account->get_api_certificate();
-				                        $value['sandbox_api_username']    = $account->get_sandbox_api_username();
-				                        $value['sandbox_api_password']    = $account->get_sandbox_api_password();
-				                        $value['sandbox_api_signature']   = $account->get_sandbox_api_signature();
-				                        $value['sandbox_api_certificate'] = $account->get_sandbox_api_certificate();
-				                        break;
-			                        }
-		                        }
-	                        }
-                        }
+									if ( $account->is_valid() && ( $deposit + $total ) <= $limit_per_day ) {
+										$value['api_username']            = $account->get_api_username();
+										$value['api_password']            = $account->get_api_password();
+										$value['api_signature']           = $account->get_api_signature();
+										$value['api_certificate']         = $account->get_api_certificate();
+										$value['sandbox_api_username']    = $account->get_sandbox_api_username();
+										$value['sandbox_api_password']    = $account->get_sandbox_api_password();
+										$value['sandbox_api_signature']   = $account->get_sandbox_api_signature();
+										$value['sandbox_api_certificate'] = $account->get_sandbox_api_certificate();
+										break;
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -96,33 +96,44 @@ class Paypal_Hook {
 			return;
 		}
 
-		update_post_meta( $order_id, '_paypal_account_id', $account_id );
+		$account = ggmp_paypal( $account_id );
 
-		$account       = ggmp_paypal( $account_id );
-		$limit_per_day = $account->get_limit_per_day();
-		$stats         = $account->get_stats();
+		if ( $account ) {
+			update_post_meta( $order_id, '_paypal_account_id', $account->get_id() );
 
-		$today = $account->get_current_date_stats();
+			$order->add_order_note( sprintf(
+					__( 'PayPal account assigned:  %s. API Username: %s. Sandbox API Username: %s', 'ggmp' ),
+					$account->get_name(),
+					$account->get_api_username() ? $account->get_api_username() : '---',
+					$account->get_sandbox_api_username() ? $account->get_sandbox_api_username() : '---'
+				)
+			);
 
-		if ( ! isset( $stats[ $today ] ) ) {
-			$stats[ $today ] = [
-				'count_order'   => 1,
-				'deposit'       => $order->get_total(),
-				'orders'        => [ $order_id ],
-				'limit_per_day' => (float) $limit_per_day,
-			];
-		} else {
-			$stats[ $today ]['count_order']   += 1;
-			$stats[ $today ]['deposit']       += $order->get_total();
-			$stats[ $today ]['orders'][]      = $order_id;
-			$stats[ $today ]['limit_per_day'] = (float) $limit_per_day;
+			$limit_per_day = $account->get_limit_per_day();
+			$stats         = $account->get_stats();
+
+			$today = $account->get_current_date_stats();
+
+			if ( ! isset( $stats[ $today ] ) ) {
+				$stats[ $today ] = [
+					'count_order'   => 1,
+					'deposit'       => $order->get_total(),
+					'orders'        => [ $order_id ],
+					'limit_per_day' => (float) $limit_per_day,
+				];
+			} else {
+				$stats[ $today ]['count_order']   += 1;
+				$stats[ $today ]['deposit']       += $order->get_total();
+				$stats[ $today ]['orders'][]      = $order_id;
+				$stats[ $today ]['limit_per_day'] = (float) $limit_per_day;
+			}
+
+			if ( count( $stats ) > 15 ) {
+				array_shift( $stats );
+			}
+
+			update_post_meta( $account->get_id(), GGMP_METABOX_PREFIX . 'stats', $stats );
 		}
-
-		if ( count( $stats ) > 15 ) {
-			array_shift( $stats );
-		}
-
-		update_post_meta( $account_id, GGMP_METABOX_PREFIX . 'stats', $stats );
 	}
 
 	public function woocommerce_review_order_after_submit() {

@@ -377,33 +377,44 @@ class Stripe_Hook {
 			return;
 		}
 
-		update_post_meta( $order_id, '_stripe_account_id', $account_id );
+		$account = ggmp_stripe( $account_id );
 
-		$account       = ggmp_stripe( $account_id );
-		$limit_per_day = $account->get_limit_per_day();
-		$stats         = $account->get_stats();
+		if ( $account ) {
+			update_post_meta( $order_id, '_stripe_account_id', $account->get_id() );
 
-		$today = $account->get_current_date_stats();
+			$order->add_order_note( sprintf(
+					__( 'Stripe account assigned:  %s. Publishable Key: %s. Test Publishable Key: %s', 'ggmp' ),
+					$account->get_name(),
+					$account->get_truncated_pk() ? $account->get_truncated_pk() : '---',
+					$account->get_truncated_test_pk() ? $account->get_truncated_test_pk() : '---'
+				)
+			);
 
-		if ( ! isset( $stats[ $today ] ) ) {
-			$stats[ $today ] = [
-				'count_order'   => 1,
-				'deposit'       => $order->get_total(),
-				'orders'        => [ $order_id ],
-				'limit_per_day' => (float) $limit_per_day,
-			];
-		} else {
-			$stats[ $today ]['count_order']   += 1;
-			$stats[ $today ]['deposit']       += $order->get_total();
-			$stats[ $today ]['orders'][]      = $order_id;
-			$stats[ $today ]['limit_per_day'] = (float) $limit_per_day;
+			$limit_per_day = $account->get_limit_per_day();
+			$stats         = $account->get_stats();
+
+			$today = $account->get_current_date_stats();
+
+			if ( ! isset( $stats[ $today ] ) ) {
+				$stats[ $today ] = [
+					'count_order'   => 1,
+					'deposit'       => $order->get_total(),
+					'orders'        => [ $order_id ],
+					'limit_per_day' => (float) $limit_per_day,
+				];
+			} else {
+				$stats[ $today ]['count_order']   += 1;
+				$stats[ $today ]['deposit']       += $order->get_total();
+				$stats[ $today ]['orders'][]      = $order_id;
+				$stats[ $today ]['limit_per_day'] = (float) $limit_per_day;
+			}
+
+			if ( count( $stats ) > 15 ) {
+				array_shift( $stats );
+			}
+
+			update_post_meta( $account->get_id(), GGMP_METABOX_PREFIX . 'stats', $stats );
 		}
-
-		if ( count( $stats ) > 15 ) {
-			array_shift( $stats );
-		}
-
-		update_post_meta( $account_id, GGMP_METABOX_PREFIX . 'stats', $stats );
 	}
 
 	public function woocommerce_review_order_after_submit() {

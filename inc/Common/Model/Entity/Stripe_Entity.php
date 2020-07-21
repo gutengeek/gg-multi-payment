@@ -232,6 +232,14 @@ class Stripe_Entity {
 		return $this->get_meta( 'test_webhook_secret' );
 	}
 
+	public function get_truncated_pk() {
+		return mb_substr( $this->get_publishable_key(), 0, 12 ) . '...' . substr( $this->get_publishable_key(), -4 );
+	}
+
+	public function get_truncated_test_pk() {
+		return mb_substr( $this->get_test_publishable_key(), 0, 12 ) . '...' . substr( $this->get_test_publishable_key(), -4 );
+	}
+
 	public function get_stats() {
 		$stats = $this->get_meta( 'stats' );
 

@@ -40,8 +40,8 @@ class Paypal_Entity {
 	public $filter;
 
 	public function __construct( $_id ) {
-		$paypal    = WP_Post::get_instance( $_id );
-		$this->ID  = $_id;
+		$paypal   = WP_Post::get_instance( $_id );
+		$this->ID = $_id;
 
 		return $this->setup( $paypal );
 	}
@@ -238,6 +238,14 @@ class Paypal_Entity {
 
 	public function get_sandbox_api_certificate() {
 		return $this->get_meta( 'sandbox_api_certificate' );
+	}
+
+	public function get_truncated_api_username() {
+		return $this->get_api_username();
+	}
+
+	public function get_truncated_sandbox_api_username() {
+		return $this->get_sandbox_api_username();
 	}
 
 	public function get_stats() {
