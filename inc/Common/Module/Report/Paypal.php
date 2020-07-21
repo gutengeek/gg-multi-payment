@@ -1033,8 +1033,15 @@ class Paypal extends \WC_Admin_Report {
                             <select name="paypal_account" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
 								<?php $current_account = isset( $_GET['paypal_account'] ) ? absint( $_GET['paypal_account'] ) : 0; ?>
 								<?php foreach ( $this->get_accounts() as $account ) : ?>
-                                    <option value="<?php echo esc_url( add_query_arg( 'paypal_account', $account->ID ) ); ?>" <?php selected( $current_account, $account->ID, true ); ?>>
-										<?php echo esc_html( $account->post_title ); ?>
+                                    <?php
+                                        $paypal_account = ggmp_paypal( $account->ID );
+                                        $sanbox = ( 'yes' === wc_gateway_ppec()->settings->use_spb );
+                                    ?>
+                                    <option value="<?php echo esc_url( add_query_arg( 'paypal_account', $paypal_account->get_id() ) ); ?>" <?php selected( $current_account, $paypal_account->get_id(), true )
+                                    ; ?>>
+										<?php echo esc_html( $paypal_account->get_name() ); ?> (<?php echo esc_html( $sanbox ? $paypal_account->get_sandbox_api_username() :
+                                            $paypal_account->get_api_username() );
+                                        ?>)
                                     </option>
 								<?php endforeach; ?>
                             </select>

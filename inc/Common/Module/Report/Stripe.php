@@ -1033,8 +1033,17 @@ class Stripe extends \WC_Admin_Report {
                             <select name="stripe_account" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
 								<?php $current_account = isset( $_GET['stripe_account'] ) ? absint( $_GET['stripe_account'] ) : 0; ?>
 								<?php foreach ( $this->get_accounts() as $account ) : ?>
-                                    <option value="<?php echo esc_url( add_query_arg( 'stripe_account', $account->ID ) ); ?>" <?php selected( $current_account, $account->ID, true ); ?>>
-										<?php echo esc_html( $account->post_title ); ?>
+									<?php
+									$stripe_account = ggmp_stripe( $account->ID );
+
+									$stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
+									$testmode        = ( ! empty( $stripe_settings['testmode'] ) && 'yes' === $stripe_settings['testmode'] ) ? true : false;
+									$test_pk         = mb_substr( $stripe_account->get_test_publishable_key(), 0, 12 ) . '...' . substr( $stripe_account->get_test_publishable_key(), -4 );
+									$pk              = mb_substr( $stripe_account->get_publishable_key(), 0, 12 ) . '...' . substr( $stripe_account->get_publishable_key(), -4 );
+									?>
+                                    <option value="<?php echo esc_url( add_query_arg( 'stripe_account', $stripe_account->get_id() ) ); ?>" <?php selected( $current_account, $stripe_account->get_id(),
+										true ); ?>>
+										<?php echo esc_html( $stripe_account->get_name() ); ?> (<?php echo esc_html( $testmode ? $test_pk : $pk ); ?>)
                                     </option>
 								<?php endforeach; ?>
                             </select>

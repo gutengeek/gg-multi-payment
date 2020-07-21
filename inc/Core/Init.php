@@ -193,7 +193,7 @@ class Init {
 	 */
 	public function define_controllers() {
 		$controllers = [
-			'checkout' => 'Checkout@register_hook_callbacks',
+			// 'checkout' => 'Checkout@register_hook_callbacks',
 		];
 
 		foreach ( $controllers as $kye => $class ) {
@@ -297,13 +297,13 @@ class Init {
 
 		$this->define_admin_metabox();
 
-		$controllers = [
-			'product' => 'Product@register_hook_callbacks',
-		];
-
-		foreach ( $controllers as $kye => $class ) {
-			$this->load_admin_controller( $class );
-		}
+		// $controllers = [
+		// 	'product' => 'Product@register_hook_callbacks',
+		// ];
+		//
+		// foreach ( $controllers as $kye => $class ) {
+		// 	$this->load_admin_controller( $class );
+		// }
 	}
 
 	/**
