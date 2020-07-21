@@ -1,6 +1,8 @@
 <?php
 namespace GGMP\Admin;
 
+use GGMP\Admin\Column\Paypal_Column;
+use GGMP\Admin\Column\Stripe_Column;
 use GGMP\Admin\Setting as Setting;
 use GGMP\Libraries as Libraries;
 
@@ -48,10 +50,12 @@ class Admin {
 	 * @since       1.0.0
 	 */
 	public function __construct( $plugin_name, $version, $plugin_text_domain ) {
-
 		$this->plugin_name        = $plugin_name;
 		$this->version            = $version;
 		$this->plugin_text_domain = $plugin_text_domain;
+
+		new Paypal_Column();
+		new Stripe_Column();
 	}
 
 	public $settings_objs = [];
