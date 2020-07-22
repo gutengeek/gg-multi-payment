@@ -53,7 +53,7 @@ class Install {
 	 * Update Opaljob version to current.
 	 */
 	private static function update_ggmp_version() {
-		// update_option( 'ggmp_version', OPALJOB_VERSION );
+		// update_option( 'ggmp_version', GGMP_VERSION );
 	}
 }
 

@@ -1,7 +1,6 @@
 <?php
 namespace GGMP\Admin\Metabox;
 
-
 use GGMP\Core\Metabox;
 
 class Stripe_Account_Metabox extends Metabox {
@@ -55,6 +54,18 @@ class Stripe_Account_Metabox extends Metabox {
 	 */
 	public function get_settings() {
 		$prefix = GGMP_METABOX_PREFIX;
+
+		if ( ! class_exists( 'WC_Stripe_Helper' ) ) {
+			return [
+				[
+					'name'        => esc_html__( 'Notice', 'ggmp' ),
+					'id'          => $prefix . 'notice',
+					'type'        => 'title',
+					'description' => sprintf( __( 'Please install and activate <a href="%s" target="_blank">WooCommerce Stripe Payment Gateway plugin</a> to use this feature.', 'ggmp' ),
+						esc_url( 'https://wordpress.org/plugins/woocommerce-gateway-stripe/' ) ),
+				],
+			];
+		}
 
 		$settings = [
 			[

@@ -56,6 +56,18 @@ class Paypal_Account_Metabox extends Metabox {
 	public function get_settings() {
 		$prefix = GGMP_METABOX_PREFIX;
 
+		if ( ! class_exists( 'WC_Gateway_PPEC_Plugin' ) ) {
+			return [
+				[
+					'name'        => esc_html__( 'Notice', 'ggmp' ),
+					'id'          => $prefix . 'notice',
+					'type'        => 'title',
+					'description' => sprintf( __( 'Please install and activate <a href="%s" target="_blank">WooCommerce PayPal Checkout Payment Gateway</a> to use this feature.', 'ggmp' ),
+						esc_url( 'https://wordpress.org/plugins/woocommerce-gateway-paypal-express-checkout/' ) ),
+				],
+			];
+		}
+
 		$settings = [
 			[
 				'name'        => esc_html__( 'Priority', 'ggmp' ),

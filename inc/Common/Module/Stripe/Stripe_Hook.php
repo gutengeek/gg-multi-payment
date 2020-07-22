@@ -54,21 +54,20 @@ class Stripe_Hook {
 	 * Hook constructor.
 	 */
 	public function __construct() {
-		if ( 'on' !== ggmp_get_option( 'enable_stripe', 'on' ) ) {
-			return;
-		}
-
 		$this->stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
 		$this->testmode        = ( ! empty( $this->stripe_settings['testmode'] ) && 'yes' === $this->stripe_settings['testmode'] ) ? true : false;
 
 		add_filter( 'option_woocommerce_stripe_settings', [ $this, 'woocommerce_stripe_settings', ], 10, 1 );
-		add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
-		add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
-		add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
 
-		add_filter( 'wc_stripe_payment_request_params', [ $this, 'wc_stripe_payment_request_params_function' ], 10, 3 );
-		add_filter( 'wc_stripe_params', [ $this, 'wc_stripe_params_function' ], 10, 3 );
-		add_filter( 'woocommerce_stripe_request_headers', [ $this, 'woocommerce_stripe_request_headers_function' ], 10, 3 );
+		if ( 'on' === ggmp_get_option( 'enable_stripe', 'on' ) ) {
+			add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
+			add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
+			add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
+
+			add_filter( 'wc_stripe_payment_request_params', [ $this, 'wc_stripe_payment_request_params_function' ], 10, 3 );
+			add_filter( 'wc_stripe_params', [ $this, 'wc_stripe_params_function' ], 10, 3 );
+			add_filter( 'woocommerce_stripe_request_headers', [ $this, 'woocommerce_stripe_request_headers_function' ], 10, 3 );
+		}
 	}
 
 	public function wc_stripe_payment_request_params_function( $params ) {

@@ -31,16 +31,20 @@ class General extends Core\Metabox {
 	public function get_settings() {
 		$fields = [
 			[
-				'id'      => 'enable_paypal',
-				'name'    => esc_html__( 'Enable PayPal Routing', 'ggmp' ),
-				'type'    => 'switch',
-				'default' => 'on',
+				'id'          => 'enable_paypal',
+				'name'        => esc_html__( 'Enable PayPal Routing', 'ggmp' ),
+				'type'        => 'switch',
+				'default'     => 'on',
+				'description' => sprintf( __( 'Please install and activate <a href="%s" target="_blank">WooCommerce PayPal Checkout Payment Gateway</a> to use this feature.', 'ggmp' ),
+					esc_url( 'https://wordpress.org/plugins/woocommerce-gateway-paypal-express-checkout/' ) ),
 			],
 			[
-				'id'      => 'enable_stripe',
-				'name'    => esc_html__( 'Enable Stripe Routing', 'ggmp' ),
-				'type'    => 'switch',
-				'default' => 'on',
+				'id'          => 'enable_stripe',
+				'name'        => esc_html__( 'Enable Stripe Routing', 'ggmp' ),
+				'type'        => 'switch',
+				'default'     => 'on',
+				'description' => sprintf( __( 'Please install and activate <a href="%s" target="_blank">WooCommerce Stripe Payment Gateway plugin</a> to use this feature.', 'ggmp' ),
+					esc_url( 'https://wordpress.org/plugins/woocommerce-gateway-stripe/' ) ),
 			],
 			[
 				'id'          => 'limit_money_per_day',
