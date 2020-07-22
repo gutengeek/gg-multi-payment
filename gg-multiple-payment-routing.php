@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       GG Multiple Payment Routing
+ * Plugin Name:       GG Multiple Payment Routing for WooCommerce
  * Plugin URI:        https://gutengeek.com
  * Description:       GG Multiple Payment Routing
  * Version:           1.0.0
