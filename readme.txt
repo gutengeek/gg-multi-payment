@@ -4,11 +4,11 @@ Tags: multiple payment routing, woocommerce paypal, woocommerce stripe, paypal, 
 Requires at least: 5.2
 Tested up to: 5.4.2
 Requires PHP: 7.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-GG Multiple Payment Routing for WooCommerce helps you create additional payment accounts (PayPal, Stripe) and auto select them base on rules.
+GG Multiple Payment Routing for WooCommerce helps you create additional payment accounts (PayPal, Stripe) and auto-select them based on rules.
 
 == Description ==
 
@@ -16,13 +16,13 @@ GG Multiple Payment Routing for WooCommerce helps you create additional payment 
 
 **GG Multiple Payment Routing for WooCommerce** helps you create additional payment accounts (PayPal, Stripe) and auto select them base on rules.
 Some payment gateways will be limited money per day. You need to receive money from more than one account.
-This plugin allows you config additional accounts with rules.
+This plugin allows you to config additional accounts with rules.
 Example: Condition: account A just can be receive maximum $200 per day, account B just can be receive maximum $300 per day.
 The plugin will choose one of two accounts automatically in the checkout page.
 
 ## Features
 * Create additional payment accounts for Paypal or Stripe
-* Switch payment accounts automatically base on rules
+* Switch payment accounts automatically based on rules
 * Show reports for each account
 
 ## Payment gateways supported:

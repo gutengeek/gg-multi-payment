@@ -59,7 +59,7 @@ class Stripe_Hook {
 
 		add_filter( 'option_woocommerce_stripe_settings', [ $this, 'woocommerce_stripe_settings', ], 10, 1 );
 
-		if ( 'on' === ggmp_get_option( 'enable_stripe', 'on' ) ) {
+		if ( 'on' === ggmp_get_option( 'enable_stripe', 'on' ) && 'yes' === $this->stripe_settings['enabled'] ) {
 			add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
 			add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
 			add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );

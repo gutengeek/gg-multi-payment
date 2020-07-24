@@ -40,6 +40,10 @@ class Paypal_Hook {
 			return $value;
 		}
 
+		if ( 'yes' !== $value['enabled'] ) {
+			return $value;
+		}
+
 		$session        = new \WC_Session_Handler();
 		$session_cookie = $session->get_session_cookie();
 		if ( $session_cookie ) {
@@ -137,6 +141,11 @@ class Paypal_Hook {
 	}
 
 	public function woocommerce_review_order_after_submit() {
+		$option = get_option( 'woocommerce_ppec_paypal_settings', [] );
+		if ( 'yes' !== $option['enabled'] ) {
+			return;
+		}
+
 		$totals     = WC()->cart->get_totals();
 		$total      = $totals['total'];
 		$account_id = 0;
@@ -165,6 +174,11 @@ class Paypal_Hook {
 	}
 
 	public function woocommerce_checkout_posted_data( $data ) {
+		$option = get_option( 'woocommerce_ppec_paypal_settings', [] );
+		if ( 'yes' !== $option['enabled'] ) {
+			return $data;
+		}
+
 		$accounts = Paypal_Query::get_paypal_accounts();
 		if ( $accounts ) {
 			$data['ggmp_paypal_account'] = absint( $_POST['ggmp_paypal_account'] );
