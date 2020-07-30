@@ -87,6 +87,12 @@ class Init {
 
 		$this->form = Form::get_instance();
 		$this->load_modules();
+
+		add_filter( 'woocommerce_api_classes', function ( $classes ) {
+			$classes[] = 'GGMP\Common\Api\Api';
+
+			return $classes;
+		} );
 	}
 
 	/**
@@ -175,7 +181,7 @@ class Init {
 	private function define_global_init() {
 		global $ggmp_options;
 
-		$settings          = get_option( 'ggmp_settings' );
+		$settings     = get_option( 'ggmp_settings' );
 		$ggmp_options = apply_filters( 'ggmp_get_settings', $settings );
 
 		$posttypes = new Posttypes();

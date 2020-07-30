@@ -139,6 +139,39 @@ class Paypal_Account_Metabox extends Metabox {
 				'type'        => 'text',
 				'description' => esc_html__( 'Get your API credentials from PayPal.', 'ggmp' ),
 			],
+			// App Credentials
+			[
+				'name'        => esc_html__( 'App Credentials (for Order Tracking, ...)', 'ggmp' ),
+				'id'          => $prefix . 'app_title',
+				'type'        => 'title',
+				'description' => esc_html__( 'Go to PayPal Developer and login with your PayPal account > My Apps & Credentials > Live tab > Create App > Enter the name of your application and click Create App button',
+					'ggmp' ),
+			],
+			[
+				'name'        => esc_html__( 'Live Client ID', 'ggmp' ),
+				'id'          => $prefix . 'client_id_live',
+				'type'        => 'text',
+				'description' => esc_html__( 'Get your Client ID from PayPal.', 'ggmp' ),
+			],
+			[
+				'name'        => esc_html__( 'Live Client Secret', 'ggmp' ),
+				'id'          => $prefix . 'secret_live',
+				'type'        => 'text',
+				'description' => esc_html__( 'Get your Client Secret from PayPal.', 'ggmp' ),
+				'after'       => '<hr>'
+			],
+			[
+				'name'        => esc_html__( 'Sandbox Client ID', 'ggmp' ),
+				'id'          => $prefix . 'client_id_sandbox',
+				'type'        => 'text',
+				'description' => esc_html__( 'Get your Client ID from PayPal.', 'ggmp' ),
+			],
+			[
+				'name'        => esc_html__( 'Sandbox Client Secret', 'ggmp' ),
+				'id'          => $prefix . 'secret_sandbox',
+				'type'        => 'text',
+				'description' => esc_html__( 'Get your Client Secret from PayPal.', 'ggmp' ),
+			],
 			// Rules
 			[
 				'name'        => esc_html__( 'Rules', 'ggmp' ),

@@ -19,14 +19,14 @@ class Paypal_Hook {
 	 * Hook constructor.
 	 */
 	public function __construct() {
-		if ( 'on' !== ggmp_get_option( 'enable_paypal', 'on' ) ) {
-			return;
+		if ( 'on' === ggmp_get_option( 'enable_paypal', 'on' ) ) {
+			add_filter( 'option_woocommerce_ppec_paypal_settings', [ $this, 'woocommerce_ppec_paypal_settings', ], 10, 1 );
+			add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
+			add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
+			add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
 		}
 
-		add_filter( 'option_woocommerce_ppec_paypal_settings', [ $this, 'woocommerce_ppec_paypal_settings', ], 10, 1 );
-		add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
-		add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
-		add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
+		add_filter( 'option_woo_orders_tracking_settings', [ $this, 'woo_orders_tracking_settings', ], 10, 1 );
 	}
 
 	/**
@@ -185,6 +185,53 @@ class Paypal_Hook {
 		}
 
 		return $data;
+	}
+
+	public function woo_orders_tracking_settings( $value ) {
+
+		if ( ! isset( $_POST['action_nonce'] ) ) {
+			return $value;
+		}
+
+		$action_nonce = isset( $_POST['action_nonce'] ) ? wp_unslash( sanitize_text_field( $_POST['action_nonce'] ) ) : '';
+		// if ( ! wp_verify_nonce( $action_nonce, 'vi_wot_item_action_nonce' ) ) {
+		// 	return $value;
+		// }
+
+		$order_id = isset( $_POST['order_id'] ) ? sanitize_text_field( $_POST['order_id'] ) : '';
+		$item_id  = isset( $_POST['item_id'] ) ? sanitize_text_field( $_POST['item_id'] ) : '';
+
+		if ( ! $order_id ) {
+			return $value;
+		}
+
+		if ( ! function_exists( 'wc_get_order' ) ) {
+			return $value;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( $order ) {
+			$paypal_account_id = get_post_meta( $order->get_id(), '_paypal_account_id', true );
+			if ( $paypal_account_id ) {
+				$account = ggmp_paypal( $paypal_account_id );
+
+				$available_paypal_method = $value['paypal_method'];
+				$i                       = array_search( 'ppec_paypal', $available_paypal_method );
+				if ( is_numeric( $i ) ) {
+					$sandbox = $value['paypal_sandbox_enable'][ $i ] ? true : false;
+					if ( $sandbox ) {
+						$value['paypal_client_id_sandbox'][ $i ] = $account->get_client_id_sandbox();
+						$value['paypal_secret_sandbox'][ $i ]    = $account->get_secret_sandbox();
+					} else {
+						$value['paypal_client_id_live'][ $i ] = $account->get_client_id_live();
+						$value['paypal_secret_live'][ $i ]    = $account->get_secret_live();
+					}
+				}
+			}
+		}
+
+		return $value;
 	}
 }
 

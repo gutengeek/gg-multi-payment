@@ -240,6 +240,22 @@ class Paypal_Entity {
 		return $this->get_meta( 'sandbox_api_certificate' );
 	}
 
+	public function get_client_id_live() {
+		return $this->get_meta( 'client_id_live' );
+	}
+
+	public function get_secret_live() {
+		return $this->get_meta( 'secret_live' );
+	}
+
+	public function get_client_id_sandbox() {
+		return $this->get_meta( 'client_id_sandbox' );
+	}
+
+	public function get_secret_sandbox() {
+		return $this->get_meta( 'secret_sandbox' );
+	}
+
 	public function get_truncated_api_username() {
 		return $this->get_api_username();
 	}
