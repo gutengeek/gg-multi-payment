@@ -34,7 +34,7 @@ class Stripe_Column {
 				break;
 
 			case 'deposited_today' :
-				echo wc_price( $account->get_deposit() );
+				echo function_exists( 'wc_price' ) ?  wc_price( $account->get_deposit() ) : $account->get_deposit();
 				break;
 		}
 	}
