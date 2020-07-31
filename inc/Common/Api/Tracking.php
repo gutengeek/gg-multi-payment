@@ -83,37 +83,36 @@ class Tracking extends \WC_REST_CRUD_Controller {
 			return new \WP_Error( "woocommerce_rest_{$this->post_type}_invalid_id", __( 'Invalid ID.', 'ggmp' ), [ 'status' => 400 ] );
 		}
 
-		if ( ! $request->has_param( 'tracking_id' ) ) {
-			return new \WP_Error( "woocommerce_rest_{$this->post_type}_missing_tracking_id", __( 'Missing Tracking ID.', 'ggmp' ), [ 'status' => 400 ] );
+		if ( ! $request->has_param( 'tracking_code' ) ) {
+			return new \WP_Error( "woocommerce_rest_{$this->post_type}_missing_tracking_code", __( 'Missing Tracking ID.', 'ggmp' ), [ 'status' => 400 ] );
 		}
 
-		$tracking_id = $request->get_param( 'tracking_id' );
-
-
-		return $request->get_param( 'tracking_id' );
+		return $this->save_track_info_all_item( $request, $object );
 	}
 
 	/**
+	 * @param \WP_REST_Request $request Full details about the request.
+	 * @param \WC_Order        $order   order.
 	 * @throws \Exception
 	 */
-	public function wotv_save_track_info_all_item( $request ) {
+	public function save_track_info_all_item( $request, $order ) {
 		if ( ! class_exists( 'VI_WOO_ORDERS_TRACKING_DATA' ) ) {
 			return new \WP_Error( "woocommerce_rest_{$this->post_type}_missing_tracking_plugin", __( 'Missing Tracking Plugin.', 'ggmp' ), [ 'status' => 400 ] );
 		}
 
+		$order_id                 = $order->get_id();
+		$transition_id            = $order->get_transaction_id();
 		$class_settings           = new \VI_WOO_ORDERS_TRACKING_DATA();
-		$order_id                 = isset( $request['id'] ) ? sanitize_text_field( $request['id'] ) : '';
+		$add_to_paypal            = isset( $request['add_to_paypal'] ) ? sanitize_text_field( $request['add_to_paypal'] ) : 1;
+		$tracking_number          = isset( $request['tracking_code'] ) ? sanitize_text_field( $request['tracking_code'] ) : '';
+		$transID                  = isset( $request['transID'] ) ? sanitize_text_field( $request['transID'] ) : $transition_id;
 		$change_order_status      = isset( $request['change_order_status'] ) ? sanitize_text_field( $request['change_order_status'] ) : '';
 		$send_mail                = isset( $request['send_mail'] ) ? sanitize_text_field( $request['send_mail'] ) : '';
-		$add_to_paypal            = isset( $request['add_to_paypal'] ) ? sanitize_text_field( $request['add_to_paypal'] ) : '';
-		$transID                  = isset( $request['transID'] ) ? sanitize_text_field( $request['transID'] ) : '';
-		$paypal_method            = isset( $request['paypal_method'] ) ? sanitize_text_field( $request['paypal_method'] ) : '';
-		$tracking_number          = isset( $request['tracking_code'] ) ? sanitize_text_field( $request['tracking_code'] ) : '';
+		$paypal_method            = isset( $request['paypal_method'] ) ? sanitize_text_field( $request['paypal_method'] ) : 'ppec_paypal';
 		$carrier_slug             = isset( $request['carrier_id'] ) ? sanitize_text_field( $request['carrier_id'] ) : '';
 		$carrier_name             = isset( $request['carrier_name'] ) ? sanitize_text_field( $request['carrier_name'] ) : '';
 		$add_new_carrier          = isset( $request['add_new_carrier'] ) ? sanitize_text_field( $request['add_new_carrier'] ) : '';
 		$carrier_type             = '';
-		$order                    = wc_get_order( $order_id );
 		$settings                 = $class_settings->get_params();
 		$settings['order_status'] = $change_order_status;
 		$response                 = [
@@ -209,15 +208,17 @@ class Tracking extends \WC_REST_CRUD_Controller {
 		if ( ! $paypal_added_trackings ) {
 			$paypal_added_trackings = [];
 		}
-		if ( $add_to_paypal === 'yes' && $transID && $paypal_method && ! in_array( $tracking_number, $paypal_added_trackings ) ) {
-			$send_paypal       = [
+		if ( $add_to_paypal && $transID && $paypal_method && ! in_array( $tracking_number, $paypal_added_trackings ) ) {
+			$send_paypal = [
 				[
 					'trans_id'        => $transID,
 					'carrier_name'    => $carrier_name,
 					'tracking_number' => $tracking_number,
 				],
 			];
-			$result_add_paypal = $this->add_trackinfo_to_paypal( $send_paypal, $paypal_method );
+
+			$result_add_paypal = $this->add_trackinfo_to_paypal( $send_paypal, $paypal_method, $order );
+
 			if ( $result_add_paypal['status'] === 'error' ) {
 				$response['paypal_status']  = 'error';
 				$response['paypal_message'] = empty( $result_add_paypal['data'] ) ? __( 'Cannot add tracking to PayPal', 'ggmp' ) : $result_add_paypal['data'];
@@ -235,6 +236,7 @@ class Tracking extends \WC_REST_CRUD_Controller {
 			$response['paypal_button_class'] = 'inactive';
 			$response['paypal_button_title'] = __( 'This tracking number was added to PayPal', 'ggmp' );
 		}
+
 		global $wpdb;
 
 		$query       = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}woocommerce_order_items WHERE order_id = %s AND order_item_type='line_item'", $order_id );
@@ -341,26 +343,44 @@ class Tracking extends \WC_REST_CRUD_Controller {
 		return $response;
 	}
 
-	public function add_trackinfo_to_paypal( $send_paypal, $paypal_method ) {
-		$class_settings           = new \VI_WOO_ORDERS_TRACKING_DATA();
+	/**
+	 * @param           $send_paypal
+	 * @param           $paypal_method
+	 * @param \WC_Order $order
+	 * @return array
+	 */
+	public function add_trackinfo_to_paypal( $send_paypal, $paypal_method, $order ) {
+		$class_settings          = new \VI_WOO_ORDERS_TRACKING_DATA();
 		$available_paypal_method = $class_settings->get_params( 'paypal_method' );
 		$i                       = array_search( $paypal_method, $available_paypal_method );
 		if ( is_numeric( $i ) ) {
-			$sandbox = $class_settings->get_params( 'paypal_sandbox_enable' )[ $i ] ? true : false;
-			if ( $sandbox ) {
-				$client_id = $class_settings->get_params( 'paypal_client_id_sandbox' )[ $i ];
-				$secret    = $class_settings->get_params( 'paypal_secret_sandbox' )[ $i ];
+			$sandbox           = $class_settings->get_params( 'paypal_sandbox_enable' )[ $i ] ? true : false;
+			$paypal_account_id = get_post_meta( $order->get_id(), '_paypal_account_id', true );
+			if ( $paypal_account_id ) {
+				$account = ggmp_paypal( $paypal_account_id );
+				if ( $sandbox ) {
+					$client_id = $account->get_client_id_sandbox();
+					$secret    = $account->get_secret_sandbox();
+				} else {
+					$client_id = $account->get_client_id_live();
+					$secret    = $account->get_secret_live();
+				}
 			} else {
-				$client_id = $class_settings->get_params( 'paypal_client_id_live' )[ $i ];
-				$secret    = $class_settings->get_params( 'paypal_secret_live' )[ $i ];
+				if ( $sandbox ) {
+					$client_id = $class_settings->get_params( 'paypal_client_id_sandbox' )[ $i ];
+					$secret    = $class_settings->get_params( 'paypal_secret_sandbox' )[ $i ];
+				} else {
+					$client_id = $class_settings->get_params( 'paypal_client_id_live' )[ $i ];
+					$secret    = $class_settings->get_params( 'paypal_secret_live' )[ $i ];
+				}
 			}
 
 			$result = \VI_WOO_ORDERS_TRACKING_ADMIN_PAYPAL::add_tracking_number( $client_id, $secret, $send_paypal, $sandbox );
 		} else {
-			$result = array(
+			$result = [
 				'status' => 'error',
-				'data'   => __( 'PayPal method not found', 'ggmp' )
-			);
+				'data'   => __( 'PayPal method not found', 'ggmp' ),
+			];
 		}
 
 		return $result;
