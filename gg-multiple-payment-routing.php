@@ -3,7 +3,7 @@
  * Plugin Name:       GG Multiple Payment Routing for WooCommerce
  * Plugin URI:        https://gutengeek.com
  * Description:       GG Multiple Payment Routing
- * Version:           1.0.2
+ * Version:           1.0.3
  * Author:            GutenGeek
  * Author URI:        https://gutengeek.com/contact
  * License:           GPL-2.0+
@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Define Constants
  */
 define( 'GGMP', 'ggmp' );
-define( 'GGMP_VERSION', '1.0.2' );
+define( 'GGMP_VERSION', '1.0.3' );
 define( 'GGMP_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GGMP_URL', plugin_dir_url( __FILE__ ) );
 define( 'GGMP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -69,6 +69,9 @@ class GGMP {
 	 * @access    public
 	 */
 	public static function init() {
+		if ( ! class_exists( 'GGMP\Core\Init' ) ) {
+			return;
+		}
 
 		if ( null === self::$init ) {
 			self::$init = new Init();

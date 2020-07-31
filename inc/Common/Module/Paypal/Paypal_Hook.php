@@ -26,7 +26,10 @@ class Paypal_Hook {
 			add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
 		}
 
-		add_filter( 'option_woo_orders_tracking_settings', [ $this, 'woo_orders_tracking_settings', ], 10, 1 );
+		add_filter( 'woo_orders_tracking_settings-paypal_client_id_sandbox', [ $this, 'paypal_client_id_sandbox' ] );
+		add_filter( 'woo_orders_tracking_settings-paypal_secret_sandbox', [ $this, 'paypal_secret_sandbox' ] );
+		add_filter( 'woo_orders_tracking_settings-paypal_client_id_live', [ $this, 'paypal_client_id_live' ] );
+		add_filter( 'woo_orders_tracking_settings-paypal_secret_live', [ $this, 'paypal_secret_live' ] );
 	}
 
 	/**
@@ -187,19 +190,28 @@ class Paypal_Hook {
 		return $data;
 	}
 
-	public function woo_orders_tracking_settings( $value ) {
+	public function paypal_client_id_sandbox( $value ) {
+		return $this->hook_tracking_setting( $value, 'paypal_client_id_sandbox' );
+	}
 
+	public function paypal_secret_sandbox( $value ) {
+		return $this->hook_tracking_setting( $value, 'paypal_secret_sandbox' );
+	}
+
+	public function paypal_client_id_live( $value ) {
+		return $this->hook_tracking_setting( $value, 'paypal_client_id_live' );
+	}
+
+	public function paypal_secret_live( $value ) {
+		return $this->hook_tracking_setting( $value, 'paypal_secret_live' );
+	}
+
+	public function hook_tracking_setting( $value, $key ) {
 		if ( ! isset( $_POST['action_nonce'] ) ) {
 			return $value;
 		}
 
-		$action_nonce = isset( $_POST['action_nonce'] ) ? wp_unslash( sanitize_text_field( $_POST['action_nonce'] ) ) : '';
-		// if ( ! wp_verify_nonce( $action_nonce, 'vi_wot_item_action_nonce' ) ) {
-		// 	return $value;
-		// }
-
 		$order_id = isset( $_POST['order_id'] ) ? sanitize_text_field( $_POST['order_id'] ) : '';
-		$item_id  = isset( $_POST['item_id'] ) ? sanitize_text_field( $_POST['item_id'] ) : '';
 
 		if ( ! $order_id ) {
 			return $value;
@@ -214,18 +226,25 @@ class Paypal_Hook {
 		if ( $order ) {
 			$paypal_account_id = get_post_meta( $order->get_id(), '_paypal_account_id', true );
 			if ( $paypal_account_id ) {
-				$account = ggmp_paypal( $paypal_account_id );
+				$account                 = ggmp_paypal( $paypal_account_id );
+				$settings                = get_option( 'woo_orders_tracking_settings', [] );
+				$available_paypal_method = $settings['paypal_method'] ? $settings['paypal_method'] : [ '' ];
 
-				$available_paypal_method = $value['paypal_method'];
-				$i                       = array_search( 'ppec_paypal', $available_paypal_method );
+				$i = array_search( 'ppec_paypal', $available_paypal_method );
 				if ( is_numeric( $i ) ) {
-					$sandbox = $value['paypal_sandbox_enable'][ $i ] ? true : false;
-					if ( $sandbox ) {
-						$value['paypal_client_id_sandbox'][ $i ] = $account->get_client_id_sandbox();
-						$value['paypal_secret_sandbox'][ $i ]    = $account->get_secret_sandbox();
-					} else {
-						$value['paypal_client_id_live'][ $i ] = $account->get_client_id_live();
-						$value['paypal_secret_live'][ $i ]    = $account->get_secret_live();
+					switch ( $key ) {
+						case 'paypal_client_id_sandbox':
+							$value[ $i ] = $account->get_client_id_sandbox();
+							break;
+						case 'paypal_secret_sandbox':
+							$value[ $i ] = $account->get_secret_sandbox();
+							break;
+						case 'paypal_client_id_live':
+							$value[ $i ] = $account->get_client_id_live();
+							break;
+						case 'paypal_secret_live':
+							$value[ $i ] = $account->get_secret_live();
+							break;
 					}
 				}
 			}

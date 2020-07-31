@@ -88,10 +88,12 @@ class Init {
 		$this->form = Form::get_instance();
 		$this->load_modules();
 
-		add_filter( 'woocommerce_api_classes', function ( $classes ) {
-			$classes[] = 'GGMP\Common\Api\Api';
+		add_filter( 'woocommerce_rest_api_get_rest_namespaces', function ( $namespaces ) {
+			$v3 = $namespaces['wc/v3'];
+			$v3['ggmp_tracking'] =  'GGMP\Common\Api\Tracking';
+			$namespaces['wc/v3'] = $v3;
 
-			return $classes;
+			return $namespaces;
 		} );
 	}
 
