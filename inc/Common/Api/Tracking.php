@@ -103,13 +103,13 @@ class Tracking extends \WC_REST_CRUD_Controller {
 		$order_id                 = $order->get_id();
 		$transition_id            = $order->get_transaction_id();
 		$class_settings           = new \VI_WOO_ORDERS_TRACKING_DATA();
-		$add_to_paypal            = isset( $request['add_to_paypal'] ) ? sanitize_text_field( $request['add_to_paypal'] ) : 1;
 		$tracking_number          = isset( $request['tracking_code'] ) ? sanitize_text_field( $request['tracking_code'] ) : '';
+		$carrier_slug             = isset( $request['carrier_id'] ) ? sanitize_text_field( $request['carrier_id'] ) : '';
+		$add_to_paypal            = isset( $request['add_to_paypal'] ) ? sanitize_text_field( $request['add_to_paypal'] ) : 1;
 		$transID                  = isset( $request['transID'] ) ? sanitize_text_field( $request['transID'] ) : $transition_id;
 		$change_order_status      = isset( $request['change_order_status'] ) ? sanitize_text_field( $request['change_order_status'] ) : '';
 		$send_mail                = isset( $request['send_mail'] ) ? sanitize_text_field( $request['send_mail'] ) : '';
 		$paypal_method            = isset( $request['paypal_method'] ) ? sanitize_text_field( $request['paypal_method'] ) : 'ppec_paypal';
-		$carrier_slug             = isset( $request['carrier_id'] ) ? sanitize_text_field( $request['carrier_id'] ) : '';
 		$carrier_name             = isset( $request['carrier_name'] ) ? sanitize_text_field( $request['carrier_name'] ) : '';
 		$add_new_carrier          = isset( $request['add_new_carrier'] ) ? sanitize_text_field( $request['add_new_carrier'] ) : '';
 		$carrier_type             = '';
@@ -193,9 +193,11 @@ class Tracking extends \WC_REST_CRUD_Controller {
 				$carrier_url = '';
 			}
 		}
+
 		$response['carrier_id']   = $carrier_slug;
 		$response['carrier_type'] = $carrier_type;
 		$response['carrier_url']  = $carrier_url;
+
 		if ( ! $order_id || ( ! $tracking_number && $digital_delivery != 1 ) || ! $carrier_slug || ! $carrier_type ) {
 			wp_send_json(
 				[
@@ -204,10 +206,13 @@ class Tracking extends \WC_REST_CRUD_Controller {
 				]
 			);
 		}
+
 		$paypal_added_trackings = get_post_meta( $order_id, 'vi_wot_paypal_added_tracking_numbers', true );
+
 		if ( ! $paypal_added_trackings ) {
 			$paypal_added_trackings = [];
 		}
+
 		if ( $add_to_paypal && $transID && $paypal_method && ! in_array( $tracking_number, $paypal_added_trackings ) ) {
 			$send_paypal = [
 				[
@@ -276,6 +281,7 @@ class Tracking extends \WC_REST_CRUD_Controller {
 						'carrier_type'    => '',
 						'time'            => $now,
 					];
+
 					$tracking_change       = true;
 					if ( $item_tracking_data ) {
 						$item_tracking_data = json_decode( $item_tracking_data, true );
