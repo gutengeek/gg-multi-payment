@@ -108,7 +108,7 @@ class Tracking extends \WC_REST_CRUD_Controller {
 		$add_to_paypal            = isset( $request['add_to_paypal'] ) ? sanitize_text_field( $request['add_to_paypal'] ) : 1;
 		$transID                  = isset( $request['transID'] ) ? sanitize_text_field( $request['transID'] ) : $transition_id;
 		$change_order_status      = isset( $request['change_order_status'] ) ? sanitize_text_field( $request['change_order_status'] ) : '';
-		$send_mail                = isset( $request['send_mail'] ) ? sanitize_text_field( $request['send_mail'] ) : '';
+		$send_mail                = isset( $request['send_mail'] ) ? sanitize_text_field( $request['send_mail'] ) : 0;
 		$paypal_method            = isset( $request['paypal_method'] ) ? sanitize_text_field( $request['paypal_method'] ) : 'ppec_paypal';
 		$carrier_name             = isset( $request['carrier_name'] ) ? sanitize_text_field( $request['carrier_name'] ) : '';
 		$add_new_carrier          = isset( $request['add_new_carrier'] ) ? sanitize_text_field( $request['add_new_carrier'] ) : '';
@@ -138,7 +138,7 @@ class Tracking extends \WC_REST_CRUD_Controller {
 			'digital_delivery'         => 0,
 		];
 
-		$settings['email_enable'] = $send_mail === 'yes' ? 1 : 0;
+		$settings['email_enable'] = $send_mail === 'yes' || $send_mail === 1 ? 1 : 0;
 		$tracking_more_slug       = '';
 		$digital_delivery         = 0;
 		if ( $add_new_carrier ) {
@@ -331,7 +331,7 @@ class Tracking extends \WC_REST_CRUD_Controller {
 					do_action( 'vi_woo_orders_tracking_single_edit_tracking_change', $tracking_change, $current_tracking_data, $item_id, $order_id, $response );
 				}
 			}
-			if ( 'yes' === $send_mail && count( $send_mail_array ) ) {
+			if ( ( 'yes' === $send_mail || 1 === $send_mail ) && count( $send_mail_array ) ) {
 				\VI_WOO_ORDERS_TRACKING_ADMIN_IMPORT_CSV::send_mail( $order_id, $send_mail_array, true );
 			}
 			$response['tracking_url_show']   = $tracking_url_import;

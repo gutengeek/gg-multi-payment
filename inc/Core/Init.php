@@ -89,9 +89,12 @@ class Init {
 		$this->load_modules();
 
 		add_filter( 'woocommerce_rest_api_get_rest_namespaces', function ( $namespaces ) {
-			$v3 = $namespaces['wc/v3'];
-			$v3['ggmp_tracking'] =  'GGMP\Common\Api\Tracking';
-			$namespaces['wc/v3'] = $v3;
+			if ( class_exists( 'VI_WOO_ORDERS_TRACKING_DATA' ) ) {
+				$v3                           = $namespaces['wc/v3'];
+				$v3['ggmp_tracking']          = 'GGMP\Common\Api\Tracking';
+				$v3['ggmp_shipping_carriers'] = 'GGMP\Common\Api\Shipping_Carriers';
+				$namespaces['wc/v3']          = $v3;
+			}
 
 			return $namespaces;
 		} );
