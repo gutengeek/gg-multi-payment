@@ -20,7 +20,7 @@ class Paypal_Hook {
 	 */
 	public function __construct() {
 		if ( 'on' === ggmp_get_option( 'enable_paypal', 'on' ) ) {
-			add_filter( 'option_woocommerce_ppec_paypal_settings', [ $this, 'woocommerce_ppec_paypal_settings', ], 10, 1 );
+			add_filter( 'option_woocommerce_ppec_paypal_settings', [ $this, 'woocommerce_ppec_paypal_settings_hook_func', ], 10, 1 );
 			add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
 			add_action( 'woocommerce_checkout_order_processed', [ $this, 'woocommerce_checkout_order_processed' ], 10, 3 );
 			add_action( 'woocommerce_review_order_after_submit', [ $this, 'woocommerce_review_order_after_submit' ], 10, 1 );
@@ -38,7 +38,17 @@ class Paypal_Hook {
 	 * @param $value
 	 * @return array
 	 */
-	public function woocommerce_ppec_paypal_settings( $value ) {
+	public function woocommerce_ppec_paypal_settings_hook_func( $value ) {
+		global $wpdb;
+
+		if ( ! $wpdb ) {
+			return $value;
+		}
+
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			return $value;
+		}
+
 		if ( ! function_exists( 'wc_gateway_ppec' ) || is_admin() ) {
 			return $value;
 		}
@@ -59,6 +69,7 @@ class Paypal_Hook {
 						$total = $cart_total['total'];
 						if ( $total ) {
 							$accounts = Paypal_Query::get_paypal_accounts();
+
 							if ( $accounts ) {
 								foreach ( $accounts as $account ) {
 									$account       = ggmp_paypal( $account->ID );
@@ -253,5 +264,3 @@ class Paypal_Hook {
 		return $value;
 	}
 }
-
-
