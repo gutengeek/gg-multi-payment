@@ -1,0 +1,174 @@
+
+$padding-base:15px;
+// Variables
+//
+// Variables should follow the `$component-state-property-size` formula for
+// consistent naming. Ex: $nav-link-disabled-color and $modal-content-box-shadow-xs.
+
+// Color system
+
+$white:    #fff !default;
+$gray-100: #f0f0f0 !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #6c757d !default;
+$gray-700: #495057 !default;
+$gray-800: #3f4448 !default;
+$gray-900: #212529 !default;
+$black:    #000 !default;
+
+
+
+$blue:    #007bff !default;
+$indigo:  #6610f2 !default;
+$purple:  #6f42c1 !default;
+$pink:    #e83e8c !default;
+$red:     #dc3545 !default;
+$orange:  #fd7e14 !default;
+$yellow:  #ffc107 !default;
+$green:   #28a745 !default;
+$teal:    #20c997 !default;
+$cyan:    #17a2b8 !default;
+
+
+$primary:       #2196F3 !default;
+$secondary:     #3f4448 !default;
+$success:       $green !default;
+$info:          $cyan !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-100 !default;
+$dark:          $gray-800 !default;
+
+$border-width: 1px;
+$border-color: #cdcdcd;
+
+
+.ggmp-metabox-panel-wrap {
+	background:#FFF;
+}
+
+/** input group */
+.ggmp-repeatable-field-section {
+	table {
+		width:100%;
+	}
+	.ggmp-template {
+		display:none;
+	}
+
+	.button-action {
+		cursor:hand;
+		cursor:pointer;
+		padding-left:5px;
+		padding-right:5px;
+	}
+	.opal-row-body {
+		padding:$padding-base;
+		background-color:#fcfcfc
+	}
+	.button-action-group {
+	 	display:inline-block;
+	 	float:right;
+
+	}
+	.opal-row-head {
+		border-bottom:solid 3px $border-color;
+		position: relative;
+
+		padding:8px 0px;
+
+		.repeat-title {
+			font-size:14px;
+			margin:0;
+			display:inline-block;
+		}
+	}
+	.ggmp-add-repeater-field-section-row-wrap {
+		padding:$padding-base;
+	}
+}
+
+label.ggmp-label {
+	display: inline-block;
+	width: 15%;
+	font-weight: 500;
+	font-size: 14px;
+}
+
+.ggmp-field-wrap {
+	padding: 15px 0;
+	display: flex;
+
+	&.ggmp-title-field-wrap {
+		display: block;
+	}
+}
+
+.ggmp-field-main {
+	display: inline-block;
+}
+
+.ggmp-switch-field-wrap .ggmp-description {
+	display: inline-block;
+	margin-left: 15px;
+}
+
+.checkbox-list {
+	&.checkbox-block {
+		.checkbox-item {
+			display: block;
+		}
+	}
+
+	&.checkbox-inline {
+		.checkbox-item {
+			display: inline-block;
+
+			&:not(:last-child) {
+				margin-right: 15px;
+			}
+		}
+	}
+
+	.checkbox-item {
+		font-size: 14px;
+		line-height: 16px;
+		margin: 1px 0 5px 0;
+	}
+}
+
+.radio-list {
+	&.radio-block {
+		.radio-item {
+			display: block;
+		}
+	}
+
+	&.radio-inline {
+		.radio-item {
+			display: inline-block;
+
+			&:not(:last-child) {
+				margin-right: 15px;
+			}
+		}
+	}
+
+	.radio-item {
+		font-size: 14px;
+		line-height: 16px;
+		margin: 1px 0 5px 0;
+	}
+}
+
+.ggmp-field-wrap input[type="checkbox"] {
+	margin: 0 5px 0 0;
+	padding: 0;
+}
+
+.ggmp-multicheck-action {
+	margin-bottom: 15px;
+}

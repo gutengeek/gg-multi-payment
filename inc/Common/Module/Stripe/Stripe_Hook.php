@@ -446,7 +446,7 @@ class Stripe_Hook {
 
 	public function woocommerce_checkout_posted_data( $data ) {
 		$accounts = Stripe_Query::get_stripe_accounts();
-		if ( $accounts ) {
+		if ( $accounts && isset( $_POST['ggmp_stripe_account'] ) ) {
 			$data['ggmp_stripe_account'] = absint( $_POST['ggmp_stripe_account'] );
 		}
 

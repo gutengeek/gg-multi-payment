@@ -193,9 +193,22 @@ class Paypal_Entity {
 		return get_post_meta( $this->ID, GGMP_METABOX_PREFIX . $key, $single );
 	}
 
+	public function get_enable() {
+		return $this->get_meta( 'enable' );
+	}
+
+	public function is_enable() {
+		$enable = $this->get_enable();
+
+		if ( '' === $enable || '1' == $enable ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	public function is_valid() {
-		// TODO:...
-		return true;
+		return $this->is_enable();
 	}
 
 	public function get_status_code() {

@@ -13,10 +13,11 @@ class Paypal_Column {
 
 	public function set_custom_edit_columns( $columns ) {
 		unset( $columns['date'] );
-		$columns['api_username']      = __( 'Live API Username', 'ggmp' );
+		$columns['enable']               = __( 'Enable', 'ggmp' );
+		$columns['api_username']         = __( 'Live API Username', 'ggmp' );
 		$columns['sandbox_api_username'] = __( 'Sandbox API Username', 'ggmp' );
-		$columns['deposited_today']   = __( 'Deposited today', 'ggmp' );
-		$columns['date']              = __( 'Date', 'ggmp' );
+		$columns['deposited_today']      = __( 'Deposited today', 'ggmp' );
+		$columns['date']                 = __( 'Date', 'ggmp' );
 
 		return $columns;
 	}
@@ -25,6 +26,16 @@ class Paypal_Column {
 	public function custom_column( $column, $post_id ) {
 		$account = ggmp_paypal( $post_id );
 		switch ( $column ) {
+			case 'enable' :
+				$checked = $account->is_enable() ? 'checked' : '';
+				$switch  = '<label class="ggmp-enable-switch-input">';
+				$switch  .= '<input type="checkbox" id="' . esc_attr( $post_id ) . '" value="on" class="js-ggmp-change-status ggmp-enable-switch form-control" ' . $checked . ' />';
+				$switch  .= '<span class="slider round"></span>';
+				$switch  .= '</label>';
+
+				echo $switch;
+				break;
+
 			case 'api_username' :
 				echo '<code>' . $account->get_api_username() ? $account->get_api_username() : '---' . '</code>';
 				break;

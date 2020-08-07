@@ -194,7 +194,7 @@ class Paypal_Hook {
 		}
 
 		$accounts = Paypal_Query::get_paypal_accounts();
-		if ( $accounts ) {
+		if ( $accounts && isset( $_POST['ggmp_paypal_account'] ) ) {
 			$data['ggmp_paypal_account'] = absint( $_POST['ggmp_paypal_account'] );
 		}
 

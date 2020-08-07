@@ -13,6 +13,7 @@ class Stripe_Column {
 
 	public function set_custom_edit_columns( $columns ) {
 		unset( $columns['date'] );
+		$columns['enable']               = __( 'Enable', 'ggmp' );
 		$columns['publishable_key']      = __( 'Publishable Key', 'ggmp' );
 		$columns['test_publishable_key'] = __( 'Test Publishable Key', 'ggmp' );
 		$columns['deposited_today']      = __( 'Deposited today', 'ggmp' );
@@ -25,6 +26,16 @@ class Stripe_Column {
 	public function custom_column( $column, $post_id ) {
 		$account = ggmp_stripe( $post_id );
 		switch ( $column ) {
+			case 'enable' :
+				$checked   = $account->is_enable() ? 'checked' : '';
+				$switch    = '<label class="ggmp-enable-switch-input">';
+				$switch    .= '<input type="checkbox" id="' . esc_attr( $post_id ) . '" value="on" class="js-ggmp-change-status ggmp-enable-switch form-control" ' . $checked . ' />';
+				$switch    .= '<span class="slider round"></span>';
+				$switch    .= '</label>';
+
+				echo $switch;
+				break;
+
 			case 'publishable_key' :
 				echo '<code>' . $account->get_truncated_pk() ? $account->get_truncated_pk() : '---' . '</code>';
 				break;
@@ -34,7 +45,7 @@ class Stripe_Column {
 				break;
 
 			case 'deposited_today' :
-				echo function_exists( 'wc_price' ) ?  wc_price( $account->get_deposit() ) : $account->get_deposit();
+				echo function_exists( 'wc_price' ) ? wc_price( $account->get_deposit() ) : $account->get_deposit();
 				break;
 		}
 	}
