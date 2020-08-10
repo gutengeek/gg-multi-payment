@@ -45,7 +45,10 @@ class Paypal_Column {
 				break;
 
 			case 'deposited_today' :
-				echo function_exists( 'wc_price' ) ? wc_price( $account->get_deposit() ) : $account->get_deposit();
+				$deposit = function_exists( 'wc_price' ) ? wc_price( $account->get_deposit() ) : $account->get_deposit();
+				$limit   = function_exists( 'wc_price' ) ? wc_price( $account->get_limit_per_day() ) : $account->get_limit_per_day();
+				$status  = ( (float) $account->get_deposit() >= (float) $account->get_limit_per_day() ) ? 'limited' : '';
+				echo '<span class="ggmp-deposit-status ' . $status . '">' . $deposit . '/' . $limit . '</span>';
 				break;
 		}
 	}

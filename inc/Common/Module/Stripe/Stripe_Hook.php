@@ -54,6 +54,7 @@ class Stripe_Hook {
 	 * Hook constructor.
 	 */
 	public function __construct() {
+		add_filter( 'wc_stripe_use_default_customer_source', [ $this, 'wc_stripe_use_default_customer_source' ] );
 		$this->stripe_settings = get_option( 'woocommerce_stripe_settings', [] );
 		$this->testmode        = ( ! empty( $this->stripe_settings['testmode'] ) && 'yes' === $this->stripe_settings['testmode'] ) ? true : false;
 
@@ -69,6 +70,10 @@ class Stripe_Hook {
 			add_filter( 'woocommerce_stripe_request_headers', [ $this, 'woocommerce_stripe_request_headers_function' ], 10, 3 );
 		}
 	}
+
+	public function wc_stripe_use_default_customer_source( $value ) {
+	    return false;
+    }
 
 	public function wc_stripe_payment_request_params_function( $params ) {
 		$cart = WC()->cart;

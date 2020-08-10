@@ -27,11 +27,11 @@ class Stripe_Column {
 		$account = ggmp_stripe( $post_id );
 		switch ( $column ) {
 			case 'enable' :
-				$checked   = $account->is_enable() ? 'checked' : '';
-				$switch    = '<label class="ggmp-enable-switch-input">';
-				$switch    .= '<input type="checkbox" id="' . esc_attr( $post_id ) . '" value="on" class="js-ggmp-change-status ggmp-enable-switch form-control" ' . $checked . ' />';
-				$switch    .= '<span class="slider round"></span>';
-				$switch    .= '</label>';
+				$checked = $account->is_enable() ? 'checked' : '';
+				$switch  = '<label class="ggmp-enable-switch-input">';
+				$switch  .= '<input type="checkbox" id="' . esc_attr( $post_id ) . '" value="on" class="js-ggmp-change-status ggmp-enable-switch form-control" ' . $checked . ' />';
+				$switch  .= '<span class="slider round"></span>';
+				$switch  .= '</label>';
 
 				echo $switch;
 				break;
@@ -45,7 +45,10 @@ class Stripe_Column {
 				break;
 
 			case 'deposited_today' :
-				echo function_exists( 'wc_price' ) ? wc_price( $account->get_deposit() ) : $account->get_deposit();
+				$deposit = function_exists( 'wc_price' ) ? wc_price( $account->get_deposit() ) : $account->get_deposit();
+				$limit   = function_exists( 'wc_price' ) ? wc_price( $account->get_limit_per_day() ) : $account->get_limit_per_day();
+				$status  = ( (float) $account->get_deposit() >= (float) $account->get_limit_per_day() ) ? 'limited' : '';
+				echo '<span class="ggmp-deposit-status ' . $status . '">' . $deposit . '/' . $limit . '</span>';
 				break;
 		}
 	}
