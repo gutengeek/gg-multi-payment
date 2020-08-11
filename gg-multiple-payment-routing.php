@@ -3,7 +3,7 @@
  * Plugin Name:       GG Multiple Payment Routing for WooCommerce
  * Plugin URI:        https://gutengeek.com
  * Description:       GG Multiple Payment Routing for WooCommerce helps you create additional payment accounts (PayPal, Stripe) and auto-select them based on rules.
- * Version:           1.0.7
+ * Version:           1.0.7.1
  * Author:            GutenGeek
  * Author URI:        https://gutengeek.com/contact
  * License:           GPL-2.0+
@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Define Constants
  */
 define( 'GGMP', 'ggmp' );
-define( 'GGMP_VERSION', '1.0.7' );
+define( 'GGMP_VERSION', '1.0.7.1' );
 define( 'GGMP_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GGMP_URL', plugin_dir_url( __FILE__ ) );
 define( 'GGMP_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

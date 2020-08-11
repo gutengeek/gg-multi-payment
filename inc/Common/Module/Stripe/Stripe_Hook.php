@@ -59,6 +59,7 @@ class Stripe_Hook {
 		$this->testmode        = ( ! empty( $this->stripe_settings['testmode'] ) && 'yes' === $this->stripe_settings['testmode'] ) ? true : false;
 
 		add_filter( 'option_woocommerce_stripe_settings', [ $this, 'woocommerce_stripe_settings', ], 10, 1 );
+		add_filter( 'option_woocommerce_stripe_settings', [ $this, 'woocommerce_stripe_settings_checkout_function', ], 10, 1 );
 
 		if ( 'on' === ggmp_get_option( 'enable_stripe', 'on' ) && 'yes' === $this->stripe_settings['enabled'] ) {
 			add_filter( 'woocommerce_checkout_posted_data', [ $this, 'woocommerce_checkout_posted_data', ], 10, 1 );
@@ -72,8 +73,72 @@ class Stripe_Hook {
 	}
 
 	public function wc_stripe_use_default_customer_source( $value ) {
-	    return false;
-    }
+		return false;
+	}
+
+	/**
+	 * Change stripe settings.
+	 *
+	 * @param $value
+	 * @return array
+	 */
+	public function woocommerce_stripe_settings_checkout_function( $value ) {
+		global $wpdb;
+
+		if ( ! $wpdb ) {
+			return $value;
+		}
+
+		if ( ! class_exists( 'WooCommerce' ) ) {
+			return $value;
+		}
+
+		if ( ! function_exists( 'woocommerce_gateway_stripe_init' ) || is_admin() ) {
+			return $value;
+		}
+
+		if ( 'yes' !== $value['enabled'] ) {
+			return $value;
+		}
+
+		$session        = new \WC_Session_Handler();
+		$session_cookie = $session->get_session_cookie();
+		if ( $session_cookie ) {
+			if ( isset( $session_cookie[0] ) && $session_cookie[0] ) {
+				$session_data = $session->get_session( $session_cookie[0] );
+
+				if ( isset( $session_data['cart_totals'] ) && $session_data['cart_totals'] ) {
+					$cart_total = maybe_unserialize( $session_data['cart_totals'] );
+					if ( isset( $cart_total['total'] ) ) {
+						$total = $cart_total['total'];
+						if ( $total ) {
+							$accounts = Stripe_Query::get_stripe_accounts();
+
+							if ( $accounts ) {
+								foreach ( $accounts as $account ) {
+									$account       = ggmp_stripe( $account->ID );
+									$deposit       = $account->get_deposit();
+									$limit_per_day = $account->get_limit_per_day();
+
+									if ( $account->is_valid() && ( $deposit + $total ) <= $limit_per_day ) {
+										$value['publishable_key']      = $account->get_publishable_key();
+										$value['secret_key']           = $account->get_secret_key();
+										$value['webhook_secret']       = $account->get_webhook_secret();
+										$value['test_publishable_key'] = $account->get_test_publishable_key();
+										$value['test_secret_key']      = $account->get_test_secret_key();
+										$value['test_webhook_secret']  = $account->get_test_webhook_secret();
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $value;
+	}
 
 	public function wc_stripe_payment_request_params_function( $params ) {
 		$cart = WC()->cart;
