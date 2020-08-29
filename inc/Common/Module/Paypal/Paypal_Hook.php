@@ -150,6 +150,7 @@ class Paypal_Hook {
 				array_shift( $stats );
 			}
 
+			update_post_meta( $order_id, '_paypal_order_created_at', $today );
 			update_post_meta( $account->get_id(), GGMP_METABOX_PREFIX . 'stats', $stats );
 		}
 	}

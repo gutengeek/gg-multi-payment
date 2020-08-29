@@ -70,6 +70,11 @@ class Stripe_Hook {
 			add_filter( 'wc_stripe_params', [ $this, 'wc_stripe_params_function' ], 10, 3 );
 			add_filter( 'woocommerce_stripe_request_headers', [ $this, 'woocommerce_stripe_request_headers_function' ], 10, 3 );
 		}
+
+		add_action( 'woocommerce_order_status_failed', [ $this, 'recal_cancel_payment' ] );
+		add_action( 'woocommerce_order_status_cancelled', [ $this, 'recal_cancel_payment' ] );
+		add_action( 'woocommerce_order_status_refunded', [ $this, 'recal_cancel_payment' ] );
+		add_action( 'woocommerce_order_status_pending', [ $this, 'recal_cancel_payment' ] );
 	}
 
 	public function wc_stripe_use_default_customer_source( $value ) {
@@ -482,6 +487,7 @@ class Stripe_Hook {
 				array_shift( $stats );
 			}
 
+			update_post_meta( $order_id, '_stripe_order_created_at', $today );
 			update_post_meta( $account->get_id(), GGMP_METABOX_PREFIX . 'stats', $stats );
 		}
 	}
@@ -514,6 +520,12 @@ class Stripe_Hook {
 		<?php
 	}
 
+	/**
+	 * Add stripe account data.
+	 *
+	 * @param $data
+	 * @return mixed
+	 */
 	public function woocommerce_checkout_posted_data( $data ) {
 		$accounts = Stripe_Query::get_stripe_accounts();
 		if ( $accounts && isset( $_POST['ggmp_stripe_account'] ) ) {
@@ -521,6 +533,55 @@ class Stripe_Hook {
 		}
 
 		return $data;
+	}
+
+	public function recal_cancel_payment( $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			return;
+		}
+
+		if ( 'stripe' !== $order->get_payment_method() ) {
+			return;
+		}
+
+		$account_id = get_post_meta( $order_id, '_stripe_account_id', true );
+
+		if ( ! $account_id ) {
+			return;
+		}
+
+		$account = ggmp_stripe( $account_id );
+
+		if ( ! $account ) {
+			return;
+		}
+
+		$stats      = $account->get_stats();
+		$created_at = get_post_meta( $order_id, '_stripe_order_created_at', true );
+
+		$current_count_order = $stats[ $created_at ]['count_order'];
+		$current_deposit     = $stats[ $created_at ]['deposit'];
+		$current_orders      = $stats[ $created_at ]['orders'];
+
+		if ( isset( $stats[ $created_at ] ) ) {
+			if ( $current_count_order > 0 ) {
+				$stats[ $created_at ]['count_order'] = $current_count_order - 1;
+			}
+
+			if ( (float) $current_deposit >= (float) $order->get_total() ) {
+				$stats[ $created_at ]['deposit'] = (float) $current_deposit - (float) $order->get_total();
+			} else {
+				$stats[ $created_at ]['deposit'] = 0;
+			}
+
+			if ( isset( $current_orders[ $order_id ] ) ) {
+				unset( $stats[ $created_at ]['orders'][ $order_id ] );
+			}
+		}
+
+		update_post_meta( $account->get_id(), GGMP_METABOX_PREFIX . 'stats', $stats );
 	}
 }
 
